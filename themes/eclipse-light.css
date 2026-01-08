@@ -1,0 +1,370 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Crimson+Pro:wght@400;500&display=swap");
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family:
+        "Inter",
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
+    line-height: 1.65;
+    color: #0a0a0a;
+    background: linear-gradient(
+        to bottom,
+        #ffffff 0%,
+        #f5f5f5 50%,
+        #e8e8e8 100%
+    );
+    padding: 100px 40px;
+    max-width: 900px;
+    margin: 0 auto;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 400;
+    position: relative;
+}
+
+body::before {
+    display: none;
+}
+
+.profile {
+    text-align: center;
+    margin-bottom: 140px;
+    position: relative;
+}
+
+.profile-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin: 0 auto 48px;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #0a0a0a;
+    box-shadow: 0 0 0 8px rgba(10, 10, 10, 0.03);
+}
+
+.profile-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+h1 {
+    font-family: "Crimson Pro", Georgia, serif;
+    font-size: 72px;
+    font-weight: 400;
+    margin-bottom: 24px;
+    color: #0a0a0a;
+    letter-spacing: -3px;
+    line-height: 0.9;
+}
+
+.subtitle {
+    font-size: 11px;
+    color: #0a0a0a;
+    margin-bottom: 0;
+    font-weight: 500;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+.contact-icons {
+    display: flex;
+    gap: 40px;
+    margin-top: 40px;
+    margin-bottom: 0;
+    justify-content: center;
+}
+
+.icon-link {
+    color: #0a0a0a;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0.3;
+}
+
+.icon-link:hover {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+.icon-link svg {
+    display: block;
+}
+
+.bio {
+    max-width: 480px;
+    margin: 0 auto 140px;
+    color: #0a0a0a;
+    font-size: 18px;
+    line-height: 1.9;
+    letter-spacing: -0.02em;
+    font-weight: 300;
+    text-align: center;
+    opacity: 0.7;
+    margin-top: 60px;
+}
+
+h2 {
+    font-size: 9px;
+    font-weight: 600;
+    margin: 0 0 80px 0;
+    text-transform: uppercase;
+    letter-spacing: 6px;
+    color: #0a0a0a;
+    text-align: center;
+}
+
+.section {
+    margin-bottom: 180px;
+}
+
+.section:last-child {
+    margin-bottom: 0;
+}
+
+.project {
+    margin-bottom: 60px;
+    padding-bottom: 0;
+    border-bottom: none;
+    text-align: center;
+}
+
+.project:last-child {
+    margin-bottom: 0;
+}
+
+.project-name {
+    font-family: "Crimson Pro", Georgia, serif;
+    font-size: 42px;
+    font-weight: 400;
+    margin-bottom: 20px;
+    color: #0a0a0a;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+}
+
+.project-desc {
+    color: #0a0a0a;
+    margin-bottom: 32px;
+    font-size: 16px;
+    line-height: 1.8;
+    letter-spacing: -0.01em;
+    font-weight: 300;
+    opacity: 0.6;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.project-link {
+    color: #0a0a0a;
+    text-decoration: none;
+    font-size: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 3px;
+    font-weight: 500;
+    text-transform: uppercase;
+    border-bottom: 1px solid #0a0a0a;
+    padding-bottom: 2px;
+}
+
+.project-link::after {
+    content: "→";
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.project-link:hover {
+    gap: 24px;
+}
+
+.project-link:hover::after {
+    transform: translateX(8px);
+}
+
+/* Experience Section */
+.experience-item {
+    margin-bottom: 60px;
+    padding-bottom: 0;
+    border-bottom: none;
+    text-align: center;
+}
+
+.experience-item:last-child {
+    margin-bottom: 0;
+}
+
+.experience-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.experience-role {
+    font-family: "Crimson Pro", Georgia, serif;
+    font-size: 36px;
+    font-weight: 400;
+    color: #0a0a0a;
+    letter-spacing: -1px;
+    line-height: 1.2;
+}
+
+.experience-period {
+    font-size: 10px;
+    color: #0a0a0a;
+    letter-spacing: 3px;
+    font-variant-numeric: tabular-nums;
+    text-transform: uppercase;
+    opacity: 0.4;
+}
+
+.experience-org {
+    font-size: 14px;
+    color: #0a0a0a;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+    font-weight: 400;
+    opacity: 0.5;
+}
+
+.experience-desc {
+    color: #0a0a0a;
+    font-size: 16px;
+    line-height: 1.8;
+    letter-spacing: -0.01em;
+    font-weight: 300;
+    opacity: 0.6;
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+/* Publications Section */
+.publication-item {
+    margin-bottom: 60px;
+    padding-bottom: 0;
+    border-bottom: none;
+    text-align: center;
+}
+
+.publication-item:last-child {
+    margin-bottom: 0;
+}
+
+.publication-title {
+    font-family: "Crimson Pro", Georgia, serif;
+    font-size: 32px;
+    font-weight: 400;
+    color: #0a0a0a;
+    letter-spacing: -0.8px;
+    margin-bottom: 16px;
+    line-height: 1.3;
+}
+
+.publication-meta {
+    font-size: 12px;
+    color: #0a0a0a;
+    margin-bottom: 0;
+    letter-spacing: 2px;
+    opacity: 0.4;
+}
+
+/* Skills Section */
+.skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+}
+
+.skill-tag {
+    display: inline-block;
+    padding: 14px 32px;
+    background: transparent;
+    border: 1px solid rgba(10, 10, 10, 0.15);
+    color: #0a0a0a;
+    font-size: 11px;
+    letter-spacing: 2px;
+    border-radius: 50px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 400;
+    text-transform: uppercase;
+    opacity: 0.5;
+}
+
+.skill-tag:hover {
+    border-color: #0a0a0a;
+    opacity: 1;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(10, 10, 10, 0.08);
+}
+
+/* Generic Section Items */
+.generic-item {
+    margin-bottom: 60px;
+    padding-bottom: 0;
+    border-bottom: none;
+    text-align: center;
+}
+
+.generic-item:last-child {
+    margin-bottom: 0;
+}
+
+.generic-name {
+    font-family: "Crimson Pro", Georgia, serif;
+    font-size: 32px;
+    font-weight: 400;
+    color: #0a0a0a;
+    letter-spacing: -0.8px;
+    margin-bottom: 16px;
+    line-height: 1.3;
+}
+
+.generic-desc {
+    color: #0a0a0a;
+    font-size: 16px;
+    line-height: 1.8;
+    letter-spacing: -0.01em;
+    font-weight: 300;
+    opacity: 0.6;
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 80px 28px;
+    }
+
+    h1 {
+        font-size: 56px;
+    }
+
+    .profile {
+        margin-bottom: 100px;
+    }
+
+    .section {
+        margin-bottom: 140px;
+    }
+
+    .project-name {
+        font-size: 36px;
+    }
+}

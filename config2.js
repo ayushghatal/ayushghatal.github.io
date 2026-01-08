@@ -1,11 +1,4 @@
-const config = {
-  // ============================================
-  // THEME
-  // ============================================
-
-  // Theme name here, default "Light"
-  theme: "dark",
-
+const portfolio = {
   // ============================================
   // BASIC INFORMATION
   // ============================================
@@ -20,7 +13,7 @@ const config = {
   bio: "I am currently pursuing B.Tech in Electronics and Communication Engineering from GBPIET Pauri India.",
 
   // Photo: Put your image URL here, or leave as "placeholder" to show initials
-  photo: "avatar.png",
+  photo: "profile.png",
 
   // ============================================
   // CONTACT & SOCIAL LINKS
@@ -50,12 +43,6 @@ const config = {
           description:
             "Implimentation of ray casting in 2D with a light source and a object. Made with SDL in C.",
           link: "https://github.com/ayushghatal/2D-Ray-Casting", // optional
-        },
-        {
-          name: "Minimal Portfolio Template",
-          description:
-            "Easy to configure portfolio template for non coders with more than 20 themes.",
-          link: "https://github.com/ayushghatal/Portfolio-Template", // optional
         },
         /*{
           name: "Tetris on 8x8 LED Matrix",
@@ -92,13 +79,15 @@ const config = {
           role: "Artificial Intelligence Fundamentals",
           organization: "IBM",
           period: "August - 2025",
-          description: "", // optional
+          description:
+            "", // optional
         },
         {
           role: "Python",
           organization: "Kaggle",
           period: "August - 2025",
-          description: "",
+          description:
+            "",
         },
         // Add more experience by copying the block above
       ],
@@ -112,17 +101,21 @@ const config = {
           role: "B.Tech in Electronics and Communication Engineering",
           organization: "GBPIET Pauri",
           period: "Aug 2025 - Present",
-          description: "", // optional
+          description:
+            "", // optional
         },
         {
           role: "High School",
           organization: "GNFCS Mussoorie",
           period: "Apr - 2023",
-          description: "",
+          description:
+            "",
         },
         // Add more experience by copying the block above
       ],
     },
+
+    
 
     // -------------------- PUBLICATIONS --------------------
     /*{
