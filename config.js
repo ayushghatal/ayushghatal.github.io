@@ -33,22 +33,6 @@ const portfolio = {
   // Just copy-paste a section block to add more
 
   sections: [
-    // -------------------- SKILLS --------------------
-    {
-      title: "Skills",
-      type: "skills",
-      items: [
-        "Git",
-        "Git Hub",
-        "Matplotlob",
-        "Numpy",
-        "Python",
-        "C Programming",
-        "Canva",
-        // Add more skills - just add a line with "Skill name",
-      ],
-    },
-    
     // -------------------- PROJECTS --------------------
     {
       title: "Projects", // Change this to whatever you want
@@ -67,6 +51,22 @@ const portfolio = {
           link: "https://github.com/ayushghatal/Tetris-on-8x8-LED-Matrix",
         },
         // Add more projects by copying the block above
+      ],
+    },
+
+    // -------------------- SKILLS --------------------
+    {
+      title: "Skills",
+      type: "skills",
+      items: [
+        "Git",
+        "Git Hub",
+        "Matplotlob",
+        "Numpy",
+        "Python",
+        "C Programming",
+        "Canva",
+        // Add more skills - just add a line with "Skill name",
       ],
     },
 
