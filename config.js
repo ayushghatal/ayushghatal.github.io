@@ -44,12 +44,12 @@ const portfolio = {
             "Implimentation of ray casting in 2D with a light source and a object. Made with SDL in C.",
           link: "https://github.com/ayushghatal/2D-Ray-Casting", // optional
         },
-        {
+        /*{
           name: "Tetris on 8x8 LED Matrix",
           description:
             "Tetris on MAX7219 8x8 LED Matrix using Arduino UNO.",
           link: "https://github.com/ayushghatal/Tetris-on-8x8-LED-Matrix",
-        },
+        },*/
         // Add more projects by copying the block above
       ],
     },
