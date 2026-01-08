@@ -4,27 +4,27 @@ const portfolio = {
   // ============================================
 
   // Your name
-  name: "Jane Doe",
+  name: "Ayush Singh Ghatal",
 
   // Your job title or role
-  title: "Product Designer",
+  title: "ECE Undergrad",
 
   // A short bio about yourself (2-3 sentences)
-  bio: "I design digital products that people love to use. Focused on creating simple, intuitive experiences.",
+  bio: "I am currently pursuing B.Tech in Electronics and Communication Engineering from GBPIET Pauri India.",
 
   // Photo: Put your image URL here, or leave as "placeholder" to show initials
-  photo: "placeholder",
+  photo: "profile.png",
 
   // ============================================
   // CONTACT & SOCIAL LINKS
   // ============================================
   // Fill in what you use, leave blank ("") for ones you don't
 
-  email: "jane@example.com",
-  website: "janedoe.com",
-  linkedin: "linkedin.com/in/janedoe",
-  github: "github.com/janedoe",
-  twitter: "twitter.com/janedoe",
+  email: "ayushghatal@gmail.com",
+  website: "ayushghatal8@gmail.com",
+  linkedin: "linkedin.com/in/ayushsinghghatal",
+  github: "github.com/ayushghatal",
+  twitter: "x.com/ayushghatal8",
 
   // ============================================
   // SECTIONS
@@ -33,28 +33,38 @@ const portfolio = {
   // Just copy-paste a section block to add more
 
   sections: [
+    // -------------------- SKILLS --------------------
+    {
+      title: "Skills",
+      type: "skills",
+      items: [
+        "Git",
+        "Git Hub",
+        "Matplotlob",
+        "Numpy",
+        "Python",
+        "C Programming",
+        "Canva",
+        // Add more skills - just add a line with "Skill name",
+      ],
+    },
+    
     // -------------------- PROJECTS --------------------
     {
       title: "Projects", // Change this to whatever you want
       type: "projects",
       items: [
         {
-          name: "E-commerce App",
+          name: "2D Ray Casting",
           description:
-            "A mobile shopping experience with focus on speed and simplicity.",
-          link: "https://example.com/project1", // optional
+            "Implimentation of ray casting in 2D with a light source and a object. Made with SDL in C.",
+          link: "https://github.com/ayushghatal/2D-Ray-Casting", // optional
         },
         {
-          name: "Dashboard Design",
+          name: "Tetris on 8x8 LED Matrix",
           description:
-            "Analytics dashboard for tracking business metrics in real-time.",
-          link: "https://example.com/project2",
-        },
-        {
-          name: "Brand Identity",
-          description:
-            "Complete visual identity system for a sustainable fashion brand.",
-          link: "https://example.com/project3",
+            "Tetris on MAX7219 8x8 LED Matrix using Arduino UNO.",
+          link: "https://github.com/ayushghatal/Tetris-on-8x8-LED-Matrix",
         },
         // Add more projects by copying the block above
       ],
@@ -62,44 +72,53 @@ const portfolio = {
 
     // -------------------- EXPERIENCE --------------------
     {
-      title: "Experience",
+      title: "Certifications",
       type: "experience",
       items: [
         {
-          role: "Senior Product Designer",
-          organization: "Tech Company Inc",
-          period: "2022 - Present",
+          role: "Artificial Intelligence Fundamentals",
+          organization: "IBM",
+          period: "August - 2025",
           description:
-            "Leading design for core product features and design system.", // optional
+            "", // optional
         },
         {
-          role: "Product Designer",
-          organization: "Startup Labs",
-          period: "2020 - 2022",
+          role: "Python",
+          organization: "Kaggle",
+          period: "August - 2025",
           description:
-            "Designed mobile and web experiences from concept to launch.",
+            "",
         },
         // Add more experience by copying the block above
       ],
     },
 
-    // -------------------- SKILLS --------------------
     {
-      title: "Skills",
-      type: "skills",
+      title: "Education",
+      type: "experience",
       items: [
-        "Product Design",
-        "User Research",
-        "Prototyping",
-        "Design Systems",
-        "Figma, Sketch",
-        "HTML/CSS",
-        // Add more skills - just add a line with "Skill name",
+        {
+          role: "B.Tech in Electronics and Communication Engineering",
+          organization: "GBPIET Pauri",
+          period: "Aug 2025 - Present",
+          description:
+            "", // optional
+        },
+        {
+          role: "High School",
+          organization: "GNFCS Mussoorie",
+          period: "Apr - 2023",
+          description:
+            "",
+        },
+        // Add more experience by copying the block above
       ],
     },
 
+    
+
     // -------------------- PUBLICATIONS --------------------
-    {
+    /*{
       title: "Publications",
       type: "publications",
       items: [
@@ -117,7 +136,7 @@ const portfolio = {
         },
         // Add more publications by copying the block above
       ],
-    },
+    },*/
 
     // ==========================================
     // Want to add another section? Just copy one of the blocks above!
