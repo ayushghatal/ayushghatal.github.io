@@ -102,6 +102,12 @@ const config = {
       type: "experience",
       items: [
         {
+          role: "Phd in Theoretical Astrophysics",
+          organization: "IISC Bangalore",
+          period: "Aug 2028 - Future",
+          description: "Bund phad di bhai ne", // optional
+        },
+        {
           role: "B.Tech in Electronics and Communication Engineering",
           organization: "GBPIET Pauri",
           period: "Aug 2025 - Present",
