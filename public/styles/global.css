@@ -44,7 +44,7 @@ nav a {
     color: #666;
     font-size: 0.85rem;
     letter-spacing: 0.05rem;
-    transition: color 0.2s ease;
+    transition: color 0.5s ease;
 }
 
 nav a:hover {
