@@ -75,6 +75,10 @@ const id = "rn-" + Math.random().toString(36).slice(2, 8);
     import { annotate } from "rough-notation";
 
     function init(el: HTMLElement) {
+        // Prevent double-annotation if initAll() is called more than once
+        if (el.dataset.rnInitialized) return;
+        el.dataset.rnInitialized = "true";
+
         const action = el.dataset.action as any;
         const color = el.dataset.color!;
         const strokeWidth = parseFloat(el.dataset.stroke!);
@@ -114,5 +118,14 @@ const id = "rn-" + Math.random().toString(36).slice(2, 8);
         observer.observe(el);
     }
 
-    document.querySelectorAll<HTMLElement>(".rn-target").forEach(init);
+    function initAll() {
+        document.querySelectorAll<HTMLElement>(".rn-target").forEach(init);
+    }
+
+    // Runs immediately — works whether or not View Transitions is enabled
+    initAll();
+
+    // Also re-runs after each View Transitions navigation (new elements won't
+    // have data-rn-initialized set, so they get picked up; old ones are skipped)
+    document.addEventListener("astro:page-load", initAll);
 </script>
