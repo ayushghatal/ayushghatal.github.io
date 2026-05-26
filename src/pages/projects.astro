@@ -1,0 +1,43 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Highlighter from "../components/Highlighter.astro";
+import PostCard from "../components/PostCard.astro";
+
+const postFiles = import.meta.glob("./projects/*.mdx", { eager: true });
+
+const sorted = Object.values(postFiles).sort(
+    (a, b) =>
+        new Date(b.frontmatter.date).valueOf() -
+        new Date(a.frontmatter.date).valueOf(),
+);
+---
+
+<BaseLayout title="Projects">
+    <section class="hero">
+        <h1>
+            <Highlighter action="underline" color="green">Projects</Highlighter>
+        </h1>
+        <div class="post-grid">
+            {
+                sorted.map((post) => (
+                    <PostCard
+                        title={post.frontmatter.title}
+                        url={post.url}
+                        date={post.frontmatter.date}
+                        description={post.frontmatter.description}
+                        tags={post.frontmatter.tags}
+                    />
+                ))
+            }
+        </div>
+    </section>
+</BaseLayout>
+
+<style>
+    .post-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-top: 3rem;
+    }
+</style>

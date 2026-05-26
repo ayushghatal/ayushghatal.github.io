@@ -1,17 +1,56 @@
 ---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Highlighter from "../components/Highlighter.astro";
+import PostCard from "../components/PostCard.astro";
 
+const postFiles = import.meta.glob("./projects/*.mdx", { eager: true });
+
+const sorted = Object.values(postFiles)
+    .sort((a, b) => {
+        const aFeatured = a.frontmatter.featured ?? false;
+        const bFeatured = b.frontmatter.featured ?? false;
+        if (bFeatured !== aFeatured) return bFeatured - aFeatured;
+        return (
+            new Date(b.frontmatter.date).valueOf() -
+            new Date(a.frontmatter.date).valueOf()
+        );
+    })
+    .slice(0, 3);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout title="Home">
+    <section class="hero">
+        <h1>
+            Hi! I'm <Highlighter action="underline" color="yellow"
+                >Ayush</Highlighter
+            > Singh Ghatal.
+        </h1>
+        <p class="tagline">
+            I’m currently pursuing a B.Tech in Electronics and Communication
+            Engineering at GBPIET, Pauri, India. I enjoy building efficient
+            low-level systems and exploring how software interacts closely with
+            hardware. My interests primarily revolve around <b
+                ><i>Firmware Development</i></b
+            >, real-time applications, computer architecture, and digital
+            design, with a growing focus on <b><i>FPGA Engineering</i></b>, and <b
+                ><i>Embedded Systems</i></b
+            >.
+        </p>
+    </section>
+    <section class="featured-projects">
+        <h2>Projects</h2>
+        <div class="post-grid">
+            {
+                sorted.map((post) => (
+                    <PostCard
+                        title={post.frontmatter.title}
+                        url={post.url}
+                        date={post.frontmatter.date}
+                        description={post.frontmatter.description}
+                        tags={post.frontmatter.tags}
+                    />
+                ))
+            }
+        </div>
+    </section>
+</BaseLayout>

@@ -1,0 +1,148 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+const { frontmatter } = Astro.props;
+
+// Format date nicely if provided
+const formattedDate = frontmatter.date
+    ? new Date(frontmatter.date).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+      })
+    : null;
+---
+
+<BaseLayout title={frontmatter.title}>
+    <article class="prose">
+        {/* Post header */}
+        <header class="post-header">
+            <h1>{frontmatter.title}</h1>
+
+            <div class="post-meta">
+                {
+                    formattedDate && (
+                        <span class="post-date">{formattedDate}</span>
+                    )
+                }
+                {
+                    frontmatter.tags && (
+                        <div class="post-tags">
+                            {frontmatter.tags.map((tag: string) => (
+                                <span class="tag">{tag}</span>
+                            ))}
+                        </div>
+                    )
+                }
+            </div>
+
+            {
+                frontmatter.description && (
+                    <p class="post-description">{frontmatter.description}</p>
+                )
+            }
+
+            <hr class="post-divider" />
+        </header>
+
+        {/* MDX content */}
+        <div class="post-body">
+            <slot />
+        </div>
+
+        {/* Footer */}
+        <footer class="post-footer">
+            <a href="/writings" class="back-link">← back to writing</a>
+        </footer>
+    </article>
+</BaseLayout>
+
+<style>
+    /* ── Back link ── */
+    .back-link {
+        display: inline-block;
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #444;
+        text-decoration: none;
+        margin-bottom: 3rem;
+        transition: color 0.2s ease;
+    }
+
+    .back-link:hover {
+        color: #fff;
+    }
+
+    /* ── Post header ── */
+    .post-header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+        margin-bottom: 0;
+    }
+
+    .post-header h1 {
+        /* inherits .prose h1 from global.css */
+        margin-bottom: 1.25rem;
+    }
+
+    /* date sits on its own line, directly under title */
+    .post-date {
+        display: block;
+        font-size: 0.72rem;
+        color: #444;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: 0.85rem;
+    }
+
+    /* tags sit on their own line, under the date */
+    .post-tags {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+    }
+
+    .tag {
+        font-size: 0.65rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #444;
+        border: 1px solid #1e1e1e;
+        padding: 2px 8px;
+        border-radius: 2px;
+    }
+
+    /* remove the flex wrapper — date and tags are now siblings */
+    .post-meta {
+        display: contents;
+    }
+
+    /* ── Description / subtitle ── */
+    .post-description {
+        font-size: 0.95rem;
+        color: #666;
+        line-height: 1.75;
+        font-weight: 300;
+        margin-bottom: 0;
+        font-style: italic;
+        letter-spacing: 0.01em;
+    }
+
+    /* ── Divider between header and body ── */
+    .post-divider {
+        width: 100%;
+        border: none;
+        border-top: 1px solid #1a1a1a;
+        margin: 2rem 0 2.5rem;
+    }
+
+    /* ── Post footer ── */
+    .post-footer {
+        margin-top: 4rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #1a1a1a;
+    }
+</style>

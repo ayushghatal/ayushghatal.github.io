@@ -1,0 +1,80 @@
+<canvas id="spark-canvas"></canvas>
+
+<script>
+    const canvas = document.getElementById("spark-canvas");
+    const ctx = canvas.getContext("2d");
+
+    const SPARK_COUNT = 8;
+    const SPARK_COLOR = "#FFFFFF";
+    const SPARK_SIZE = 10;
+    const SPARK_RADIUS = 15;
+    const DURATION = 400;
+
+    let sparks = [];
+
+    const resize = () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const ease = (t) => t * (2 - t);
+
+    const draw = (timestamp) => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        sparks = sparks.filter((spark) => {
+            const elapsed = timestamp - spark.startTime;
+            if (elapsed >= DURATION) return false;
+
+            const progress = elapsed / DURATION;
+            const eased = ease(progress);
+            const distance = eased * SPARK_RADIUS;
+            const lineLength = SPARK_SIZE * (1 - eased);
+
+            const x1 = spark.x + distance * Math.cos(spark.angle);
+            const y1 = spark.y + distance * Math.sin(spark.angle);
+            const x2 =
+                spark.x + (distance + lineLength) * Math.cos(spark.angle);
+            const y2 =
+                spark.y + (distance + lineLength) * Math.sin(spark.angle);
+
+            ctx.strokeStyle = SPARK_COLOR;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+
+            return true;
+        });
+
+        requestAnimationFrame(draw);
+    };
+
+    requestAnimationFrame(draw);
+
+    window.addEventListener("click", (e) => {
+        const now = performance.now();
+        const newSparks = Array.from({ length: SPARK_COUNT }, (_, i) => ({
+            x: e.clientX,
+            y: e.clientY,
+            angle: (2 * Math.PI * i) / SPARK_COUNT,
+            startTime: now,
+        }));
+        sparks.push(...newSparks);
+    });
+</script>
+
+<style>
+    #spark-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 999;
+    }
+</style>

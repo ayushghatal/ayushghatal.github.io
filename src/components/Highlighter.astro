@@ -1,0 +1,118 @@
+---
+interface Props {
+    action?:
+        | "highlight"
+        | "underline"
+        | "box"
+        | "circle"
+        | "strike-through"
+        | "crossed-off"
+        | "bracket";
+    color?: string;
+    strokeWidth?: number;
+    animationDuration?: number;
+    iterations?: number;
+    padding?: number;
+    multiline?: boolean;
+    isView?: boolean;
+}
+
+const palette: Record<string, string> = {
+    blue: "#30C5FF",
+    red: "#E23D28",
+    green: "#35E93E",
+    yellow: "#FFCB1F",
+};
+
+const {
+    action = "highlight",
+    color = "yellow",
+    strokeWidth = 1.5,
+    animationDuration = 600,
+    iterations = 2,
+    padding = 2,
+    multiline = true,
+    isView = false,
+} = Astro.props;
+
+const hex = palette[color] ?? color;
+const id = "rn-" + Math.random().toString(36).slice(2, 8);
+---
+
+<span
+    id={id}
+    class="rn-target"
+    data-action={action}
+    data-color={hex}
+    data-stroke={strokeWidth}
+    data-duration={animationDuration}
+    data-iterations={iterations}
+    data-padding={padding}
+    data-multiline={String(multiline)}
+    data-inview={String(isView)}
+>
+    <slot />
+</span>
+
+<style>
+    .rn-target {
+        position: relative;
+        display: inline;
+        z-index: 0;
+    }
+
+    .rn-target svg {
+        position: absolute;
+        z-index: -1;
+        top: 0;
+        left: 0;
+        overflow: visible;
+        pointer-events: none;
+    }
+</style>
+
+<script>
+    import { annotate } from "rough-notation";
+
+    function init(el: HTMLElement) {
+        const action = el.dataset.action as any;
+        const color = el.dataset.color!;
+        const strokeWidth = parseFloat(el.dataset.stroke!);
+        const animationDuration = parseInt(el.dataset.duration!);
+        const iterations = parseInt(el.dataset.iterations!);
+        const padding = parseInt(el.dataset.padding!);
+        const multiline = el.dataset.multiline === "true";
+        const isView = el.dataset.inview === "true";
+
+        const annotation = annotate(el, {
+            type: action,
+            color,
+            strokeWidth,
+            animationDuration,
+            iterations,
+            padding,
+            multiline,
+        });
+
+        if (!isView) {
+            annotation.show();
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        annotation.show();
+                        observer.unobserve(el);
+                    }
+                });
+            },
+            { rootMargin: "-10% 0px" },
+        );
+
+        observer.observe(el);
+    }
+
+    document.querySelectorAll<HTMLElement>(".rn-target").forEach(init);
+</script>

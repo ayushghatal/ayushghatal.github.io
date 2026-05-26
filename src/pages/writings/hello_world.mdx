@@ -1,0 +1,105 @@
+---
+layout: '../../layouts/PostLayout.astro'
+title: "Hello MDX"
+date: 2024-06-01
+description: "A test post to see every prose element in action — headings, lists, code, quotes, and more."
+tags: ["test", "mdx", "design"]
+---
+
+This is the opening paragraph. It sits right below the divider, using the standard `.prose p` style — weight 300, color `#999`, line height 1.85. Notice how it reads comfortably without feeling too bright or heavy against the black background.
+
+## Typography
+
+A second-level heading marks a new section. Below it, another paragraph continues the flow. **Bold text** lifts to `#e0e0e0` so it catches the eye without screaming. *Italic text* shifts to `#aaa` and adds a quiet emphasis. You can combine them — ***bold italic*** — though it's rarely needed.
+
+Here is a longer paragraph to test reading rhythm. Good typography isn't about individual words — it's about how the eye moves across a block of text. The line height, the letter spacing, the slight warmth of `#999` against pure black — all of it works together. This sentence is here to give the paragraph enough length to feel like real prose rather than a placeholder.
+
+### Third-level heading
+
+A smaller heading, slightly dimmer at `#e0e0e0`, weight 400. It introduces a subsection without competing with the `h2` above.
+
+---
+
+## Lists
+
+An unordered list with the custom em-dash markers:
+
+- First item — sits flush with the paragraph width
+- Second item with a bit more text so the line wraps and we can see how the hanging indent behaves on longer entries that overflow a single line
+- Third item
+- Fourth item, the last one
+
+An ordered list with the dimmed counter:
+
+1. Install the MDX integration with `npx astro add mdx`
+2. Create a `.mdx` file inside `src/pages/`
+3. Add frontmatter at the top between the `---` fences
+4. Write markdown below and import components as needed
+
+A nested list:
+
+- Outer item one
+  - Nested item A
+  - Nested item B
+- Outer item two
+  - Nested item C
+
+---
+
+## Blockquote
+
+> The details are not the details. They make the design.
+> — Charles Eames
+
+A longer blockquote to see the border and italic treatment on multiple lines:
+
+> Typography is the craft of endowing human language with a durable visual form, and thus with an independent existence. Its heartwood is calligraphy — the dance, on a tiny stage, of the living, speaking hand.
+
+---
+
+## Code
+
+Inline code looks like this: `const greeting = "hello"`. It picks up the green tint from `.prose code` and sits on the dark `#111` background.
+
+A fenced code block:
+
+```javascript
+// BlogLayout.astro — frontmatter section
+const { frontmatter } = Astro.props;
+
+const formattedDate = frontmatter.date
+    ? new Date(frontmatter.date).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+      })
+    : null;
+```
+
+```css
+/* .prose p from global.css */
+.prose p {
+    font-size: 1rem;
+    line-height: 1.85;
+    color: #999;
+    font-weight: 300;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.01em;
+}
+```
+
+---
+
+## Links
+
+A [standard prose link](#) underlines with `#333` and lifts to full white on hover. The underline offset keeps it from clashing with descenders. Here is a [second link](#) in the same sentence to see spacing between two of them.
+
+---
+
+## Horizontal Rule
+
+Three dashes produce a rule that matches the post header divider — `1px solid #1a1a1a`. It's used above to separate sections, and here is a standalone one below.
+
+---
+
+That's the end of the test post. The footer below comes from `BlogLayout.astro` and shows the back link.

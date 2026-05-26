@@ -1,0 +1,318 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap");
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Inter", sans-serif;
+    font-weight: 300;
+    color: #cfcfd3;
+    background: #000000;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+    background: #a647ff;
+    color: #ffffff;
+}
+
+/* ============================================
+   HEADER / NAV
+   ============================================ */
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4rem;
+}
+
+nav {
+    display: flex;
+    gap: 1.5rem;
+}
+
+nav a {
+    text-decoration: none;
+    color: #666;
+    font-size: 0.85rem;
+    letter-spacing: 0.05rem;
+    transition: color 0.2s ease;
+}
+
+nav a:hover {
+    color: #fff;
+}
+
+/* ============================================
+   HERO
+   ============================================ */
+
+.hero {
+    padding: 2rem 0 4rem;
+}
+
+h1 {
+    font-family: "Josefin Sans", sans-serif;
+    font-size: 3rem;
+    font-weight: 300;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+}
+
+.tagline {
+    font-size: 1rem;
+    font-weight: 300;
+    color: #888;
+    line-height: 1.8;
+    letter-spacing: 0.01em;
+    max-width: 560px;
+}
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+
+.section {
+    margin-bottom: 4rem;
+}
+
+.section-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #444;
+    margin-bottom: 1.5rem;
+}
+
+/* ============================================
+   TYPOGRAPHY — general
+   ============================================ */
+
+h2 {
+    font-family: "Josefin Sans", sans-serif;
+    font-size: 1.6rem;
+    font-weight: 300;
+    color: #ffffff;
+    letter-spacing: -0.01em;
+    margin-bottom: 1rem;
+}
+
+h3 {
+    font-family: "Josefin Sans", sans-serif;
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: #e0e0e0;
+    margin-bottom: 0.75rem;
+}
+
+p {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: #888;
+    font-weight: 300;
+}
+
+a {
+    color: #cfcfd3;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: #fff;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+footer {
+    margin-top: 6rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #1a1a1a;
+    color: #333;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+}
+
+main {
+    min-height: 60vh;
+}
+
+/* ============================================
+   MDX PROSE — for writings/blog posts
+   ============================================ */
+
+.prose {
+    max-width: 640px;
+}
+
+.prose h1 {
+    font-family: "Josefin Sans", sans-serif;
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+}
+
+.prose h2 {
+    font-family: "Josefin Sans", sans-serif;
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: #ffffff;
+    letter-spacing: -0.01em;
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+}
+
+.prose h3 {
+    font-family: "Josefin Sans", sans-serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: #e0e0e0;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+}
+
+.prose p {
+    font-size: 1rem;
+    line-height: 1.85;
+    color: #999;
+    font-weight: 300;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.01em;
+}
+
+.prose strong {
+    color: #e0e0e0;
+    font-weight: 500;
+}
+
+.prose em {
+    color: #aaa;
+    font-style: italic;
+}
+
+.prose a {
+    color: #cfcfd3;
+    text-decoration: underline;
+    text-decoration-color: #333;
+    text-underline-offset: 3px;
+    transition:
+        color 0.2s ease,
+        text-decoration-color 0.2s ease;
+}
+
+.prose a:hover {
+    color: #fff;
+    text-decoration-color: #fff;
+}
+
+.prose ul,
+.prose ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.prose li {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #999;
+    font-weight: 300;
+    margin-bottom: 0.4rem;
+}
+
+.prose blockquote {
+    border-left: 2px solid #2a2a2a;
+    padding-left: 1.25rem;
+    margin: 2rem 0;
+    font-style: italic;
+    color: #666;
+    font-size: 1.05rem;
+    line-height: 1.8;
+}
+
+.prose code {
+    font-family: "JetBrains Mono", "Fira Code", monospace;
+    font-size: 0.85rem;
+    background: #111;
+    color: #a0e0a0;
+    padding: 2px 7px;
+    border-radius: 4px;
+    border: 1px solid #1e1e1e;
+}
+
+.prose pre {
+    background: #0d0d0d;
+    border: 1px solid #1a1a1a;
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto;
+    margin: 2rem 0;
+}
+
+.prose pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.875rem;
+    color: #ccc;
+    line-height: 1.7;
+}
+
+.prose hr {
+    border: none;
+    border-top: 1px solid #1a1a1a;
+    margin: 3rem 0;
+}
+
+.prose img {
+    width: 100%;
+    border-radius: 6px;
+    margin: 2rem 0;
+    border: 1px solid #1a1a1a;
+}
+
+/* post header */
+.prose .post-date {
+    font-size: 0.75rem;
+    color: #444;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 2.5rem;
+    display: block;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 600px) {
+    body {
+        padding: 1.5rem 1.25rem;
+    }
+
+    h1 {
+        font-size: 2.25rem;
+    }
+
+    .prose h1 {
+        font-size: 2rem;
+    }
+
+    header {
+        margin-bottom: 3rem;
+    }
+}

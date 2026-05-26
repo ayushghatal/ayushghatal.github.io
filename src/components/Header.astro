@@ -1,0 +1,33 @@
+---
+import Avatar from "boring-avatars";
+
+const names = [
+    "Mark Baker",
+    "Gertrude Stein",
+    "Susan B",
+    "Hetty Green",
+    "Carrie Chapman",
+    "Pearl Kendrick",
+    "Betty Ford",
+    "Belva Lockwood",
+    "Ida B",
+    "Helen Keller",
+];
+
+const name = names[Math.floor(Math.random() * names.length)];
+---
+
+<header>
+    <a href="/">
+        <Avatar
+            name={name}
+            variant="beam"
+            colors={["#30C5FF", "#E23D28", "#35E93E", "#FFCB1F", "#A647FF"]}
+        />
+    </a>
+
+    <nav>
+        <a href="/writings">writings</a>
+        <a href="/projects">projects</a>
+    </nav>
+</header>

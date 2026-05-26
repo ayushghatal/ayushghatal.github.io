@@ -1,0 +1,87 @@
+---
+interface Props {
+    title: string;
+    url: string;
+    date: string;
+    description?: string;
+    tags?: string[];
+}
+const { title, url, date, description, tags } = Astro.props;
+const formattedDate = new Date(date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+});
+---
+
+<a href={url} class="postcard">
+    <article>
+        <div class="postcard-top">
+            <span class="postcard-title">{title}</span>
+            <span class="postcard-date">{formattedDate}</span>
+        </div>
+        {description && <p class="postcard-desc">{description}</p>}
+        {
+            tags && tags.length > 0 && (
+                <div class="postcard-tags">
+                    {tags.map((tag) => (
+                        <span class="tag">{tag}</span>
+                    ))}
+                </div>
+            )
+        }
+    </article>
+</a>
+<style>
+    .postcard {
+        display: block;
+        text-decoration: none;
+        padding: 1rem 0 1rem 1rem;
+        border-left: 1px solid #1e1e1e;
+        transition: border-color 0.2s ease;
+    }
+    .postcard:hover {
+        border-color: #555;
+    }
+    .postcard-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 1rem;
+        margin-bottom: 0.4rem;
+    }
+    .postcard-title {
+        font-size: 0.9rem;
+        color: #aaa;
+        transition: color 0.2s ease;
+    }
+    .postcard:hover .postcard-title {
+        color: #fff;
+    }
+    .postcard-date {
+        font-size: 0.65rem;
+        color: #333;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    .postcard-desc {
+        font-size: 0.82rem;
+        color: #444;
+        line-height: 1.6;
+        font-weight: 300;
+        margin: 0 0 0.65rem;
+    }
+    .postcard-tags {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    .tag {
+        font-size: 0.6rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #333;
+    }
+</style>
