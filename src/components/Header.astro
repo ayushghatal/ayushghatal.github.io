@@ -14,20 +14,33 @@ const names = [
     "Helen Keller",
 ];
 
-const name = names[Math.floor(Math.random() * names.length)];
+const colors = ["#30C5FF", "#E23D28", "#35E93E", "#FFCB1F", "#A647FF"];
 ---
 
 <header>
     <a href="/">
-        <Avatar
-            name={name}
-            variant="beam"
-            colors={["#30C5FF", "#E23D28", "#35E93E", "#FFCB1F", "#A647FF"]}
-        />
+        {
+            names.map((name) => (
+                <span class="avatar-option" style="display:none">
+                    <Avatar name={name} variant="beam" colors={colors} />
+                </span>
+            ))
+        }
     </a>
-
     <nav>
         <a href="/writings">writings</a>
         <a href="/projects">projects</a>
     </nav>
 </header>
+
+<script>
+    function pickAvatar() {
+        const avatars =
+            document.querySelectorAll<HTMLElement>(".avatar-option");
+        const pick = Math.floor(Math.random() * avatars.length);
+        avatars[pick].style.display = "inline";
+    }
+
+    pickAvatar();
+    document.addEventListener("astro:page-load", pickAvatar);
+</script>
