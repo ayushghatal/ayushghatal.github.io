@@ -1,0 +1,276 @@
+---
+import { site } from '../data/site.js';
+
+// Gathers everything the palette can jump to: static pages, every writing
+// post (read straight from the source files, so new posts appear here
+// automatically), and social links.
+const pages = [
+  { label: "home", href: "/", type: "page" },
+  { label: "writing", href: "/writing", type: "page" },
+  { label: "projects", href: "/projects", type: "page" },
+];
+
+const posts = Object.values(import.meta.glob('../pages/writing/*.mdx', { eager: true }))
+  .filter((post: any) => post.frontmatter?.title)
+  .map((post: any) => ({ label: post.frontmatter.title, href: post.url, type: "post" }));
+
+const socials = [
+  { label: "github", href: site.social.github, type: "social", external: true },
+  { label: "mail", href: site.social.email, type: "social", external: false },
+  { label: "linkedin", href: site.social.linkedin, type: "social", external: true },
+];
+
+const items = [...pages, ...posts, ...socials];
+---
+<div class="palette-overlay" id="palette-overlay">
+  <div class="palette" role="dialog" aria-modal="true" aria-label="Command palette">
+    <input
+      type="text"
+      id="palette-input"
+      class="palette-input"
+      placeholder="jump to..."
+      autocomplete="off"
+      spellcheck="false"
+    />
+    <ul class="palette-list" id="palette-list">
+      {items.map((item, i) => (
+        <li
+          class="palette-item"
+          data-href={item.href}
+          data-external={item.external ? "true" : "false"}
+          data-index={i}
+          tabindex="-1"
+        >
+          <span>{item.label}</span>
+          <span class="palette-type">{item.type}</span>
+        </li>
+      ))}
+    </ul>
+    <p class="palette-empty hidden" id="palette-empty">no matches</p>
+  </div>
+</div>
+
+<script>
+  // The palette's DOM is identical on every page (same list of items), but
+  // it still gets replaced on each view-transition navigation, so element
+  // references and their listeners need to be re-attached each time
+  // (astro:page-load). The keydown shortcut itself is the one thing bound
+  // directly to `document`, which persists across transitions regardless —
+  // it's bound exactly once, guarded by a flag, so re-running this setup
+  // function on every page load never double-binds it.
+  let overlay: HTMLElement | null = null;
+  let input: HTMLInputElement | null = null;
+  let items: HTMLElement[] = [];
+  let empty: HTMLElement | null = null;
+  let selected = 0;
+
+  function visibleItems() {
+    return items.filter(i => !i.classList.contains('hidden'));
+  }
+
+  function updateSelection() {
+    const visible = visibleItems();
+    items.forEach(i => i.classList.remove('selected'));
+    const active = visible[selected];
+    if (active) {
+      active.classList.add('selected');
+      active.scrollIntoView({ block: 'nearest' });
+    }
+  }
+
+  function filter() {
+    const query = (input?.value || '').trim().toLowerCase();
+    let count = 0;
+    items.forEach(item => {
+      const match = !query || (item.textContent || '').toLowerCase().includes(query);
+      item.classList.toggle('hidden', !match);
+      if (match) count++;
+    });
+    empty?.classList.toggle('hidden', count > 0);
+    selected = 0;
+    updateSelection();
+  }
+
+  function openPalette() {
+    if (!overlay || !input) return;
+    overlay.classList.add('open');
+    input.value = '';
+    filter();
+    input.focus();
+  }
+
+  function closePalette() {
+    overlay?.classList.remove('open');
+  }
+
+  function navigate(item: HTMLElement | undefined) {
+    if (!item) return;
+    const href = item.dataset.href;
+    if (!href) return;
+    if (item.dataset.external === 'true') {
+      window.open(href, '_blank', 'noopener');
+    } else {
+      window.location.href = href;
+    }
+    closePalette();
+  }
+
+  function setupPalette() {
+    overlay = document.getElementById('palette-overlay');
+    input = document.getElementById('palette-input') as HTMLInputElement | null;
+    empty = document.getElementById('palette-empty');
+    const list = document.getElementById('palette-list');
+    items = list ? [...list.querySelectorAll('.palette-item')] as HTMLElement[] : [];
+    selected = 0;
+
+    input?.addEventListener('input', filter);
+
+    overlay?.addEventListener('click', (e) => {
+      if (e.target === overlay) closePalette();
+    });
+
+    items.forEach(item => {
+      item.addEventListener('click', () => navigate(item));
+      item.addEventListener('mouseenter', () => {
+        selected = visibleItems().indexOf(item);
+        updateSelection();
+      });
+    });
+
+    const trigger = document.getElementById('palette-trigger');
+    trigger?.addEventListener('click', openPalette);
+  }
+
+  setupPalette();
+  document.addEventListener('astro:page-load', setupPalette);
+
+  const w = window as unknown as { __paletteKeydownBound?: boolean };
+  if (!w.__paletteKeydownBound) {
+    document.addEventListener('keydown', (e) => {
+      const isMac = navigator.platform.toUpperCase().includes('MAC');
+      const cmdKey = isMac ? e.metaKey : e.ctrlKey;
+
+      if (cmdKey && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        if (overlay?.classList.contains('open')) {
+          closePalette();
+        } else {
+          openPalette();
+        }
+        return;
+      }
+
+      if (!overlay?.classList.contains('open')) return;
+
+      if (e.key === 'Escape') {
+        closePalette();
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        selected = Math.min(selected + 1, visibleItems().length - 1);
+        updateSelection();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        selected = Math.max(selected - 1, 0);
+        updateSelection();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        navigate(visibleItems()[selected]);
+      }
+    });
+    w.__paletteKeydownBound = true;
+  }
+</script>
+
+<style>
+  .palette-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 100;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 14vh;
+  }
+
+  .palette-overlay.open {
+    display: flex;
+  }
+
+  .palette {
+    width: 100%;
+    max-width: 28rem;
+    margin: 0 1.5rem;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .palette-input {
+    display: block;
+    width: 100%;
+    padding: 0.9rem 1.1rem;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+  }
+
+  .palette-input:focus {
+    outline: none;
+  }
+
+  .palette-input::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  .palette-list {
+    list-style: none;
+    margin: 0;
+    padding: 0.4rem;
+    max-height: 18rem;
+    overflow-y: auto;
+  }
+
+  .palette-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 4px;
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+
+  .palette-item.hidden {
+    display: none;
+  }
+
+  .palette-item.selected {
+    background: var(--color-bg-raised);
+    color: var(--color-text);
+  }
+
+  .palette-type {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    text-transform: lowercase;
+  }
+
+  .palette-empty {
+    padding: 1rem 1.1rem;
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+  }
+
+  .palette-empty.hidden {
+    display: none;
+  }
+</style>

@@ -5,7 +5,13 @@ const dateObj = new Date(date);
 const formatted = dateObj.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
 const eyebrow = dateObj.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 ---
-<a class="entry" href={url} data-category={category} data-date={date}>
+<a
+  class="entry"
+  href={url}
+  data-category={category}
+  data-date={date}
+  data-search={`${title} ${description ?? ''}`.toLowerCase()}
+>
   <div class="date-col">
     <time>{formatted}</time>
   </div>

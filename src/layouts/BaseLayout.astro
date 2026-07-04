@@ -1,6 +1,7 @@
 ---
 import { ViewTransitions } from 'astro:transitions';
 import Nav from '../components/Nav.astro';
+import CommandPalette from '../components/CommandPalette.astro';
 import '../styles/global.css';
 import { site } from '../data/site.js';
 
@@ -25,6 +26,7 @@ const pageTitle = title ? `${title} — ${site.name}` : site.name;
   </head>
   <body>
     <Nav postMode={postMode} headings={headings} backHref={backHref} />
+    <CommandPalette />
     <div class="page">
       <main>
         <slot />

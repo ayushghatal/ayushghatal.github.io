@@ -26,6 +26,11 @@ const posts = allPosts
       through a physics curriculum I built for myself — mostly out of
       stubbornness. This site is where both of those live.
     </p>
+    <p class="now">
+      <span class="now-label">now</span>
+      Debugging the SPI link between the STM32 and the Verilog filter, and
+      making my way through Griffiths' <em>Electrodynamics</em>.
+    </p>
   </section>
 
   <span class="section-label">activity</span>
@@ -63,6 +68,22 @@ const posts = allPosts
     line-height: 1.7;
     max-width: 34rem;
     margin-top: 1rem;
+  }
+
+  .now {
+    margin-top: 1.5rem !important;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--color-border);
+    font-size: 0.95rem !important;
+  }
+
+  .now-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: lowercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-secondary);
+    margin-right: 0.6em;
   }
 
   .see-all {

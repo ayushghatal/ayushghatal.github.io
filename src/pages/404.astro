@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="not found">
+  <div class="not-found">
+    <h1>404</h1>
+    <p>There's nothing here.</p>
+    <a href="/">&larr; return home</a>
+  </div>
+</BaseLayout>
+
+<style>
+  .not-found {
+    min-height: 50vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .not-found p {
+    color: var(--color-text-muted);
+  }
+
+  .not-found a {
+    display: inline-block;
+    margin-top: 0.5rem;
+    color: var(--color-text-secondary);
+  }
+
+  .not-found a:hover {
+    color: var(--color-text);
+  }
+</style>

@@ -26,6 +26,14 @@ const categories = [...new Set(posts.map(p => p.category))];
     </button>
   </div>
 
+  <input
+    type="search"
+    id="search-input"
+    class="search-input"
+    placeholder="search writing..."
+    aria-label="Search writing"
+  />
+
   <div class="timeline" id="timeline">
     {posts.map(post => (
       <TimelineEntry
@@ -39,42 +47,77 @@ const categories = [...new Set(posts.map(p => p.category))];
       />
     ))}
   </div>
+
+  <p class="no-results hidden" id="no-results">nothing matches that search.</p>
 </BaseLayout>
 
 <script>
-  const tabsContainer = document.getElementById('category-tabs');
-  const timeline = document.getElementById('timeline');
-  const sortToggle = document.getElementById('sort-toggle');
+  // Re-runs on first load AND after every client-side view-transition
+  // navigation (astro:page-load). Without the second listener, this
+  // would only ever work the first time /writing is visited in a
+  // session — the elements it binds to get replaced by new ones on
+  // each subsequent navigation, and stale references stop responding.
+  function setupWritingControls() {
+    const tabsContainer = document.getElementById('category-tabs');
+    const timeline = document.getElementById('timeline');
+    const sortToggle = document.getElementById('sort-toggle');
+    const searchInput = document.getElementById('search-input') as HTMLInputElement | null;
+    const noResults = document.getElementById('no-results');
+    if (!timeline || !tabsContainer || !sortToggle || !searchInput || !noResults) return;
 
-  tabsContainer?.addEventListener('click', (e) => {
-    const btn = (e.target as HTMLElement).closest('.tab') as HTMLElement | null;
-    if (!btn || !timeline) return;
+    let activeCategory = 'all';
 
-    tabsContainer.querySelectorAll('.tab').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
+    function applyFilters() {
+      const query = (searchInput!.value || '').trim().toLowerCase();
+      let visibleCount = 0;
 
-    const category = btn.dataset.category;
-    timeline.querySelectorAll('.entry').forEach(entry => {
-      const el = entry as HTMLElement;
-      const matches = category === 'all' || el.dataset.category === category;
-      el.classList.toggle('hidden', !matches);
+      timeline!.querySelectorAll('.entry').forEach(entry => {
+        const el = entry as HTMLElement;
+        const matchesCategory = activeCategory === 'all' || el.dataset.category === activeCategory;
+        const matchesSearch = !query || (el.dataset.search || '').includes(query);
+        const visible = matchesCategory && matchesSearch;
+        el.classList.toggle('hidden', !visible);
+        if (visible) visibleCount++;
+      });
+
+      noResults!.classList.toggle('hidden', visibleCount > 0);
+    }
+
+    tabsContainer.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest('.tab') as HTMLElement | null;
+      if (!btn) return;
+
+      tabsContainer.querySelectorAll('.tab').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      activeCategory = btn.dataset.category || 'all';
+      applyFilters();
     });
-  });
 
-  sortToggle?.addEventListener('click', () => {
-    if (!timeline) return;
-    const wasAscending = sortToggle.dataset.order === 'asc';
-    const nowAscending = !wasAscending;
-    sortToggle.dataset.order = nowAscending ? 'asc' : 'desc';
-    sortToggle.textContent = nowAscending ? 'oldest first' : 'newest first';
+    searchInput.addEventListener('input', applyFilters);
 
-    const entries = [...timeline.querySelectorAll('.entry')] as HTMLElement[];
-    entries.sort((a, b) => {
-      const diff = new Date(a.dataset.date!).getTime() - new Date(b.dataset.date!).getTime();
-      return nowAscending ? diff : -diff;
+    sortToggle.addEventListener('click', () => {
+      const wasAscending = sortToggle.dataset.order === 'asc';
+      const nowAscending = !wasAscending;
+      sortToggle.dataset.order = nowAscending ? 'asc' : 'desc';
+      sortToggle.textContent = nowAscending ? 'oldest first' : 'newest first';
+
+      const entries = [...timeline!.querySelectorAll('.entry')] as HTMLElement[];
+      entries.sort((a, b) => {
+        const diff = new Date(a.dataset.date!).getTime() - new Date(b.dataset.date!).getTime();
+        return nowAscending ? diff : -diff;
+      });
+      entries.forEach(entry => timeline!.appendChild(entry));
     });
-    entries.forEach(entry => timeline.appendChild(entry));
-  });
+
+    // Reset to a clean state each time this page loads (matters when
+    // navigating back to /writing after having filtered it earlier).
+    activeCategory = 'all';
+    searchInput.value = '';
+    applyFilters();
+  }
+
+  setupWritingControls();
+  document.addEventListener('astro:page-load', setupWritingControls);
 </script>
 
 <style>
@@ -136,6 +179,38 @@ const categories = [...new Set(posts.map(p => p.category))];
     content: "↕ ";
   }
 
+  .search-input {
+    display: block;
+    width: 100%;
+    margin-top: 1.25rem;
+    padding: 0.6rem 0;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+  }
+
+  .search-input::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-bottom-color: var(--color-text);
+  }
+
+  .no-results {
+    margin-top: 2rem;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+  }
+
+  .no-results.hidden {
+    display: none;
+  }
+
   .timeline {
     position: relative;
     margin-top: 0.5rem;
@@ -153,6 +228,9 @@ const categories = [...new Set(posts.map(p => p.category))];
 
   .timeline :global(.entry) {
     border-bottom: 1px solid var(--color-border);
+    /* Long archives: don't pay layout/paint cost for off-screen rows. */
+    content-visibility: auto;
+    contain-intrinsic-size: auto 140px;
   }
 
   .timeline :global(.entry:last-child) {

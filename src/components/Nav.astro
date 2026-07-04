@@ -11,8 +11,22 @@ const links = [
 ];
 const current = Astro.url.pathname;
 const toc = headings.filter(h => h.depth === 2);
+
+// This nav is persisted across page transitions (transition:persist) so it
+// never flickers or re-mounts while navigating between the site's list
+// pages — but persistence means Astro will KEEP the old DOM node instead of
+// swapping in the new page's version, which would be wrong the moment the
+// content actually needs to change (site links vs. a post's own TOC, or
+// moving from one post to a different post with different headings). Giving
+// each distinct "shape" of nav its own transition:name means Astro only
+// persists when navigating between pages that share the same name — i.e.
+// freely between home/writing/projects, but not into/out of a post, and not
+// between two different posts.
+const transitionName = postMode
+  ? `nav-post-${Astro.url.pathname.replace(/\//g, '-')}`
+  : 'nav-site';
 ---
-<nav class="floating-nav">
+<nav class="floating-nav" transition:name={transitionName} transition:persist>
   {postMode ? (
     <div class="post-nav">
       <a href={backHref} class="return">&larr; return</a>
@@ -29,11 +43,15 @@ const toc = headings.filter(h => h.depth === 2);
       {links.map(link => (
         <a
           href={link.href}
+          data-href={link.href}
           class:list={["nav-link", { active: current === link.href }]}
         >
           {link.label}
         </a>
       ))}
+      <button type="button" id="palette-trigger" class="nav-link palette-btn">
+        search <span class="kbd">&#8984;K</span>
+      </button>
       <div class="social">
         <a href={site.social.github} class="nav-link" target="_blank" rel="noopener">github</a>
         <a href={site.social.email} class="nav-link">mail</a>
@@ -42,6 +60,24 @@ const toc = headings.filter(h => h.depth === 2);
     </div>
   )}
 </nav>
+
+<script>
+  // Keeps the "active" link in sync with the current page. This has to be
+  // done in JS (not just left to Astro's server-rendered class) because
+  // the nav above is persisted across transitions — a persisted element's
+  // DOM is reused as-is, so the class baked in at build time for the FIRST
+  // page visited would otherwise stay stuck on every later navigation.
+  function updateActiveNav() {
+    const path = window.location.pathname;
+    document.querySelectorAll('.nav-link[data-href]').forEach((link) => {
+      const href = (link as HTMLElement).dataset.href;
+      link.classList.toggle('active', href === path);
+    });
+  }
+
+  updateActiveNav();
+  document.addEventListener('astro:page-load', updateActiveNav);
+</script>
 
 {postMode && toc.length > 0 && (
   <script>
@@ -111,6 +147,22 @@ const toc = headings.filter(h => h.depth === 2);
   .nav-link.active,
   .return:hover {
     color: var(--color-text);
+  }
+
+  .palette-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .kbd {
+    font-size: 0.68rem;
+    color: var(--color-text-muted);
   }
 
   .toc {

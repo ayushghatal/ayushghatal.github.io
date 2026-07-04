@@ -117,6 +117,9 @@ code {
   padding: 1rem 0;
   border-bottom: 1px solid var(--color-border);
   color: var(--color-text);
+  /* Long lists: skip layout/paint for off-screen rows until needed. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 90px;
 }
 
 .row:last-child {

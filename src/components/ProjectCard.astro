@@ -1,7 +1,15 @@
 ---
-const { title, description, tags = [], link = "#" } = Astro.props;
+import { Image } from 'astro:assets';
+
+// `image`, if provided, should be an imported image (see README — "Adding
+// a project image") — that's what lets Astro generate an optimized,
+// properly-sized file instead of shipping the original asset as-is.
+const { title, description, tags = [], link = "#", image } = Astro.props;
 ---
 <a class="row" href={link}>
+  {image && (
+    <Image src={image} alt={`Screenshot of ${title}`} width={640} height={360} class="project-image" />
+  )}
   <div class="row-top">
     <h3>{title}</h3>
     <span class="arrow">&rarr;</span>
@@ -20,6 +28,14 @@ const { title, description, tags = [], link = "#" } = Astro.props;
 </a>
 
 <style>
+  .project-image {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
   .row-top {
     display: flex;
     align-items: baseline;

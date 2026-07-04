@@ -3,12 +3,13 @@
 Minimal Astro + MDX portfolio. Pure black & white, system fonts only (no
 webfont loading), a floating nav pinned to the left-center of the screen
 (site links + socials on regular pages, "return" + scroll-spy table of
-contents on individual posts), and a GitHub-style contribution card on the
+contents on individual posts), a Cmd+K command palette, client-side search
+and filtering on `/writing`, and a GitHub-style contribution card on the
 homepage. Smooth page-to-page transitions via Astro's built-in View
-Transitions. In the style of personal dev sites like antfu.me / grizz.fyi /
-leerob.com: plain list rows instead of bordered cards, and one genuinely
-personal section (a physics reading list) instead of generic "About Me"
-filler.
+Transitions, with the nav persisted across navigation so it never flickers.
+In the style of personal dev sites like antfu.me / grizz.fyi / leerob.com:
+plain list rows instead of bordered cards, and one genuinely personal
+section (a physics reading list) instead of generic "About Me" filler.
 
 ## Running it locally
 
@@ -157,6 +158,90 @@ viewport (`src/components/Nav.astro`) — no top bar, no full-height sidebar.
 
 Add/remove site-wide links in the `links` array near the top of that file.
 
+### Why the nav is persisted, and how the active link stays correct
+
+The nav has `transition:persist`, so Astro keeps the exact same DOM element
+across navigations between `/`, `/writing`, and `/projects` instead of
+tearing it down and rebuilding it — that's what makes it feel perfectly
+still while the content cross-fades, rather than flickering.
+
+That comes with a catch: a persisted element's DOM is reused as-is, so the
+`active` class baked in at build time for whichever page loaded *first*
+would otherwise stay stuck forever. A small script re-computes which link
+should be active from `window.location.pathname` after every navigation
+(`astro:page-load`), so it stays correct regardless of persistence.
+
+The persistence itself is scoped by giving the nav a different
+`transition:name` depending on context — `'nav-site'` on regular pages, and
+a name unique to each post when viewing one. Astro only persists elements
+whose name matches on both sides of a navigation, so it persists freely
+between the site's list pages, but correctly swaps in fresh content when you
+enter a post or move from one post to a different one (each post has its
+own table of contents, so that swap has to happen — persisting across two
+different posts would leave the first post's TOC on screen).
+
+## Command palette (⌘K)
+
+Press `Cmd+K` (or `Ctrl+K` on Windows/Linux) anywhere on the site to open a
+quick-jump palette — type to filter, arrow keys to move, Enter to go. It
+also has a visible "search ⌘K" trigger in the nav on regular pages. It
+lists:
+
+- the three site pages (home, writing, projects)
+- every writing post — pulled automatically from `src/pages/writing/*.mdx`,
+  so new posts appear with no extra step
+- your social links
+
+All of this lives in `src/components/CommandPalette.astro`. There's nothing
+to configure — it stays in sync with your content automatically.
+
+## Search and filtering on /writing
+
+The controls above the writing list (category tabs, the search box, and the
+newest/oldest sort toggle) are all plain client-side JavaScript — no
+external library, and nothing to fetch. Search matches against each post's
+title and description, and works together with the category filter (both
+narrow the same list at once).
+
+## Custom 404 page
+
+`src/pages/404.astro` — matches the rest of the site instead of showing a
+default host error page. Astro and Vercel both automatically serve this for
+unmatched routes; nothing else to configure.
+
+## The "now" line
+
+Below the main intro paragraph on the homepage there's a short "now" line —
+what you're actively working on this week. It's just a paragraph in
+`src/pages/index.astro` (search for `class="now"`) — update it whenever your
+focus changes. Deliberately not a whole separate page; it's meant to be
+low-effort enough that you'll actually keep it current.
+
+## Adding a project image
+
+`ProjectCard.astro` already supports an optional image via Astro's built-in
+`<Image />` component, which generates a properly-sized, optimized file at
+build time instead of shipping your original screenshot as-is. To use it:
+
+1. Put the image under `src/assets/` (e.g. `src/assets/projects/filter-demo.png`).
+2. Import it at the top of `src/data/projects.js`:
+   ```js
+   import filterDemo from '../assets/projects/filter-demo.png';
+   ```
+3. Add `image: filterDemo` to that project's entry.
+
+No `image` key means the card just skips the image — every current project
+entry works fine as-is.
+
+## Sitemap and robots.txt
+
+`@astrojs/sitemap` is enabled in `astro.config.mjs` and generates
+`sitemap-index.xml` automatically on every build — no content to maintain.
+`public/robots.txt` points at it. **Both depend on the `site` value in
+`astro.config.mjs` being your real domain** — it's currently the placeholder
+`https://example.com`; update it (and the URL inside `robots.txt`) once you
+know your real domain, or the sitemap will contain wrong URLs.
+
 ## Smooth page transitions
 
 Astro's built-in View Transitions (`astro:transitions`) are enabled in
@@ -226,3 +311,14 @@ in `astro.config.mjs` (`shikiConfig.theme`, currently `vitesse-dark`) — any
 
 - Name and GitHub username: `src/data/site.js`.
 - Nav links: the `links` array at the top of `src/components/Nav.astro`.
+
+## Performance notes
+
+- Every list of rows (projects, writing, reading) has `content-visibility:
+  auto` — the browser skips layout/paint work for rows that are off-screen.
+  Doesn't matter yet at 3 posts; matters once you have 50.
+- Use `<Image />` (see "Adding a project image" above) for anything you add
+  going forward — it's the single biggest lever for keeping the site fast,
+  since unoptimized images are the most common cause of a slow page.
+- View Transitions + the persisted nav mean navigation never re-downloads or
+  re-parses the nav's CSS/JS — only the page content actually changes.
