@@ -1,0 +1,205 @@
+---
+import { site } from '../data/site.js';
+import { activity as fallbackActivity } from '../data/activity.js';
+
+const WEEKS = 52; // a full trailing year
+
+// Pulled at build time from a free, unauthenticated API that mirrors the
+// public GitHub contributions graph (see README). Falls back to
+// src/data/activity.js if the fetch fails so the build never breaks.
+let byDate = {};
+try {
+  const res = await fetch(
+    `https://github-contributions-api.jogruber.de/v4/${site.githubUsername}?y=last`
+  );
+  if (res.ok) {
+    const json = await res.json();
+    for (const day of json.contributions ?? []) {
+      byDate[day.date] = { level: day.level, count: day.count ?? 0 };
+    }
+  }
+} catch {
+  // network unavailable at build time — fall back below
+}
+
+if (Object.keys(byDate).length === 0) {
+  // Fallback data only has an intensity level, not a real count — treat
+  // the level itself as a rough stand-in so the headline still renders.
+  for (const [date, level] of Object.entries(fallbackActivity)) {
+    byDate[date] = { level, count: level };
+  }
+}
+
+const today = new Date();
+const end = new Date(today);
+end.setDate(end.getDate() + (6 - end.getDay())); // snap forward to Saturday
+
+const days = [];
+for (let i = WEEKS * 7 - 1; i >= 0; i--) {
+  const d = new Date(end);
+  d.setDate(d.getDate() - i);
+  const key = d.toISOString().slice(0, 10);
+  const entry = byDate[key];
+  days.push({ date: key, level: entry?.level ?? 0, count: entry?.count ?? 0 });
+}
+
+const total = days.reduce((sum, d) => sum + d.count, 0);
+
+const weeks = [];
+for (let i = 0; i < days.length; i += 7) {
+  weeks.push(days.slice(i, i + 7));
+}
+
+// A month label appears above the first week that starts a new month.
+let lastMonth = -1;
+const monthLabels = weeks.map(week => {
+  const month = new Date(week[0].date).getMonth();
+  if (month !== lastMonth) {
+    lastMonth = month;
+    return new Date(week[0].date).toLocaleDateString("en-US", { month: "short" });
+  }
+  return null;
+});
+
+const cellTemplate = `repeat(${weeks.length}, minmax(0, 1fr))`;
+---
+<div class="activity-card">
+  <p class="stat">
+    <strong>{total.toLocaleString()}</strong> contributions in the past year
+  </p>
+
+  <div class="calendar">
+    <div class="months" style={`grid-template-columns: ${cellTemplate}`}>
+      {monthLabels.map(label => <span class="month-label">{label}</span>)}
+    </div>
+    <div
+      class="cells"
+      style={`grid-template-columns: ${cellTemplate}`}
+      role="img"
+      aria-label={`${site.githubUsername}'s GitHub activity over the last year`}
+    >
+      {weeks.map(week => (
+        <div class="col">
+          {week.map(day => (
+            <span
+              class={`cell level-${day.level}`}
+              title={`${day.date}${day.count ? ` — ${day.count} contributions` : ""}`}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <div class="footer-row">
+    <a href={`https://github.com/${site.githubUsername}`} target="_blank" rel="noopener">
+      view on GitHub &rarr;
+    </a>
+    <div class="legend">
+      <span>less</span>
+      <span class="cell level-0" />
+      <span class="cell level-1" />
+      <span class="cell level-2" />
+      <span class="cell level-3" />
+      <span class="cell level-4" />
+      <span>more</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .activity-card {
+    margin: 1.5rem 0 2.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 1.5rem 1.5rem 1.25rem;
+  }
+
+  .stat {
+    margin: 0 0 1.25rem;
+    font-size: 0.95rem;
+    color: var(--color-text-secondary);
+  }
+
+  .stat strong {
+    color: var(--color-text);
+    font-weight: 700;
+  }
+
+  .calendar {
+    display: grid;
+    grid-template-rows: 14px auto;
+    row-gap: 6px;
+  }
+
+  .months {
+    display: grid;
+    column-gap: 3px;
+  }
+
+  .month-label {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    color: var(--color-text-muted);
+  }
+
+  .cells {
+    display: grid;
+    grid-auto-flow: column;
+    column-gap: 3px;
+  }
+
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .cell {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 2px;
+    background: var(--color-bg-raised);
+    display: inline-block;
+  }
+
+  .level-1 { background: #3a3a3a; }
+  .level-2 { background: #666666; }
+  .level-3 { background: #a3a3a3; }
+  .level-4 { background: #ffffff; }
+
+  .footer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1.1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .footer-row a {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  .footer-row a:hover {
+    color: var(--color-text);
+  }
+
+  .legend {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+  }
+
+  .legend .cell {
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
+  }
+</style>

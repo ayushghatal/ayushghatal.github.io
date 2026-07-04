@@ -1,0 +1,50 @@
+---
+layout: ../../layouts/PostLayout.astro
+title: "Hello World!"
+description: "Configuring USART2 at the register level — clock tree, GPIO alternate function, and the NVIC — for a debug UART library."
+date: 2026-07-04
+category: "Physics"
+tags: ["embedded", "stm32"]
+---
+
+Most STM32 tutorials reach for `HAL_UART_Init()` on the first line. That's fine for
+getting something on screen quickly, but it hides exactly the parts worth
+understanding: which clock is actually feeding the peripheral, why the GPIO pin
+needs an alternate function number and not just "output mode," and what the NVIC
+is doing before your interrupt handler ever runs.
+
+## Clock tree first
+
+Before USART2 can do anything, it needs a clock. On the G0, that means enabling
+the peripheral clock in `RCC->APBENR1` and picking a clock source in
+`RCC->CCIPR`:
+
+```c
+RCC->APBENR1 |= RCC_APBENR1_USART2EN;
+RCC->CCIPR   |= RCC_CCIPR_USART2SEL_0; // select SYSCLK as USART2 clock
+```
+
+## Configuring the pin
+
+The TX/RX pins need to be switched from GPIO to their alternate function, then
+pointed at the right AF number in `AFR`:
+
+```c
+GPIOA->MODER &= ~(GPIO_MODER_MODE2_Msk | GPIO_MODER_MODE3_Msk);
+GPIOA->MODER |=  (2 << GPIO_MODER_MODE2_Pos) | (2 << GPIO_MODER_MODE3_Pos);
+GPIOA->AFR[0] |= (1 << GPIO_AFRL_AFSEL2_Pos) | (1 << GPIO_AFRL_AFSEL3_Pos);
+```
+
+## Baud rate and enable
+
+With the clock and pins set, the baud rate register and enable bits bring the
+peripheral to life:
+
+```c
+USART2->BRR = SystemCoreClock / 115200;
+USART2->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE;
+```
+
+That's the whole peripheral, no abstraction layer in between. Once this is
+working, wrapping it in a small `debug_print()` function is the natural next
+step — that's what turned into the debug UART library linked on the homepage.

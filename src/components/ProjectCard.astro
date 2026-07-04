@@ -1,0 +1,68 @@
+---
+const { title, description, tags = [], link = "#" } = Astro.props;
+---
+<a class="row" href={link}>
+  <div class="row-top">
+    <h3>{title}</h3>
+    <span class="arrow">&rarr;</span>
+  </div>
+  <p>{description}</p>
+  {tags.length > 0 && (
+    <p class="tags">
+      {tags.map((tag, i) => (
+        <>
+          {i > 0 && <span class="sep">&middot;</span>}
+          <span>{tag.toLowerCase()}</span>
+        </>
+      ))}
+    </p>
+  )}
+</a>
+
+<style>
+  .row-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  h3 {
+    margin: 0;
+    color: var(--color-text-secondary);
+    transition: color 0.15s ease;
+  }
+
+  .row:hover h3 {
+    color: var(--color-text);
+  }
+
+  .arrow {
+    color: var(--color-text-muted);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+
+  .row:hover .arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  p {
+    margin: 0.35rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.92rem;
+  }
+
+  .tags {
+    margin-top: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+
+  .sep {
+    color: var(--color-border);
+    margin: 0 0.45em;
+  }
+</style>

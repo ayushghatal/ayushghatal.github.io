@@ -1,0 +1,179 @@
+---
+import { site } from '../data/site.js';
+
+const { postMode = false, headings = [], backHref = "/writing" } = Astro.props;
+
+// Edit this list to add/remove site-wide nav links.
+const links = [
+  { href: "/", label: "home" },
+  { href: "/writing", label: "writing" },
+  { href: "/projects", label: "projects" },
+];
+const current = Astro.url.pathname;
+const toc = headings.filter(h => h.depth === 2);
+---
+<nav class="floating-nav">
+  {postMode ? (
+    <div class="post-nav">
+      <a href={backHref} class="return">&larr; return</a>
+      {toc.length > 0 && (
+        <div class="toc">
+          {toc.map(h => (
+            <a href={`#${h.slug}`} data-slug={h.slug} class="toc-link">{h.text}</a>
+          ))}
+        </div>
+      )}
+    </div>
+  ) : (
+    <div class="site-nav">
+      {links.map(link => (
+        <a
+          href={link.href}
+          class:list={["nav-link", { active: current === link.href }]}
+        >
+          {link.label}
+        </a>
+      ))}
+      <div class="social">
+        <a href={site.social.github} class="nav-link" target="_blank" rel="noopener">github</a>
+        <a href={site.social.email} class="nav-link">mail</a>
+        <a href={site.social.linkedin} class="nav-link" target="_blank" rel="noopener">linkedin</a>
+      </div>
+    </div>
+  )}
+</nav>
+
+{postMode && toc.length > 0 && (
+  <script>
+    // Highlights the currently visible section in the floating TOC as the
+    // reader scrolls. Runs on load AND after each view-transition
+    // navigation (astro:page-load) — without that second listener, moving
+    // between posts via the soft-navigation router would leave the old
+    // observer pointed at a DOM that no longer exists.
+    function setupTOC() {
+      const links = document.querySelectorAll('.toc-link');
+      if (links.length === 0) return;
+
+      const sections = [...links]
+        .map(link => document.getElementById((link as HTMLElement).dataset.slug || ''))
+        .filter((el): el is HTMLElement => !!el);
+      if (sections.length === 0) return;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach(entry => {
+            const link = document.querySelector(`.toc-link[data-slug="${entry.target.id}"]`);
+            if (entry.isIntersecting) {
+              links.forEach(l => l.classList.remove('active'));
+              link?.classList.add('active');
+            }
+          });
+        },
+        { rootMargin: '-10% 0px -70% 0px' }
+      );
+      sections.forEach(section => observer.observe(section));
+    }
+
+    setupTOC();
+    document.addEventListener('astro:page-load', setupTOC);
+  </script>
+)}
+
+<style>
+  .floating-nav {
+    position: fixed;
+    left: 2.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+
+  .site-nav,
+  .post-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .nav-link,
+  .return,
+  .toc-link {
+    color: var(--color-text-muted);
+    border-bottom: none;
+    transition: color 0.2s ease;
+  }
+
+  .nav-link:hover,
+  .nav-link.active,
+  .return:hover {
+    color: var(--color-text);
+  }
+
+  .toc {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--color-border);
+    max-width: 11rem;
+  }
+
+  .social {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    margin-top: 0.6rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .toc-link {
+    font-size: 0.78rem;
+    line-height: 1.4;
+  }
+
+  .toc-link:hover {
+    color: var(--color-text);
+  }
+
+  .toc-link.active {
+    color: var(--color-text);
+  }
+
+  @media (max-width: 900px) {
+    .floating-nav {
+      position: static;
+      transform: none;
+      display: flex;
+      justify-content: flex-start;
+      padding: 2rem 0 1.25rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .site-nav,
+    .post-nav {
+      flex-direction: row;
+      gap: 1.25rem;
+      align-items: center;
+    }
+
+    .social {
+      flex-direction: row;
+      gap: 1.25rem;
+      margin-top: 0;
+      padding-top: 0;
+      padding-left: 1.1rem;
+      border-top: none;
+      border-left: 1px solid var(--color-border);
+    }
+
+    .toc {
+      display: none; /* keep mobile simple — just "return" */
+    }
+  }
+</style>

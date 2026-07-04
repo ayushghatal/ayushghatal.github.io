@@ -1,0 +1,46 @@
+---
+const { title, description, date, url } = Astro.props;
+const formatted = date
+  ? new Date(date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
+  : null;
+---
+<a class="row" href={url}>
+  <div class="row-top">
+    <h3>{title}</h3>
+    {formatted && <time>{formatted}</time>}
+  </div>
+  {description && <p>{description}</p>}
+</a>
+
+<style>
+  .row-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    transition: color 0.15s ease;
+  }
+
+  .row:hover h3 {
+    color: var(--color-text);
+  }
+
+  time {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  p {
+    margin: 0.35rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+  }
+</style>

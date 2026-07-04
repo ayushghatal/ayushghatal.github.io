@@ -1,0 +1,130 @@
+---
+const { title, description, date, category, tags = [], url, featured = false } = Astro.props;
+
+const dateObj = new Date(date);
+const formatted = dateObj.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+const eyebrow = dateObj.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+---
+<a class="entry" href={url} data-category={category} data-date={date}>
+  <div class="date-col">
+    <time>{formatted}</time>
+  </div>
+  <div class="marker-col">
+    <span class:list={["dot", { featured }]} />
+  </div>
+  <div class="content-col">
+    {featured && <p class="eyebrow">latest &middot; {eyebrow}</p>}
+    <h3 class:list={{ "title-lg": featured }}>{title}</h3>
+    <p class:list={["description", { clamp: !featured }]}>{description}</p>
+    <p class="sub-meta">
+      <span>{category.toLowerCase()}</span>
+      {featured && tags.map(tag => (
+        <>
+          <span class="sep">&middot;</span>
+          <span>{tag.toLowerCase()}</span>
+        </>
+      ))}
+    </p>
+  </div>
+</a>
+
+<style>
+  .entry {
+    display: grid;
+    grid-template-columns: 5.5rem 1.25rem 1fr;
+    color: var(--color-text);
+    padding: 1.1rem 0;
+  }
+
+  .entry.hidden {
+    display: none;
+  }
+
+  .date-col {
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 0.75rem;
+    padding-top: 0.2rem;
+  }
+
+  .date-col time {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  .marker-col {
+    display: flex;
+    justify-content: center;
+    padding-top: 0.3rem;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-bg);
+    border: 1.5px solid var(--color-text-muted);
+    z-index: 1;
+  }
+
+  .dot.featured {
+    border-color: var(--color-text);
+    background: var(--color-text);
+  }
+
+  .eyebrow {
+    margin: 0 0 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    color: var(--color-text);
+  }
+
+  h3 {
+    margin: 0 0 0.35rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    font-family: var(--font-body);
+    color: var(--color-text-secondary);
+    transition: color 0.15s ease;
+  }
+
+  h3.title-lg {
+    font-family: var(--font-body);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  .entry:hover h3 {
+    color: var(--color-text);
+  }
+
+  .description {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+
+  .description.clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .sub-meta {
+    margin: 0.5rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+  }
+
+  .sep {
+    color: var(--color-border);
+    margin: 0 0.5em;
+  }
+</style>

@@ -1,0 +1,161 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TimelineEntry from '../../components/TimelineEntry.astro';
+
+const posts = Object.values(import.meta.glob('./*.mdx', { eager: true }))
+  .filter(post => post.frontmatter?.title)
+  .map(post => ({ ...post.frontmatter, category: post.frontmatter.category || "General", url: post.url }))
+  .sort((a, b) => new Date(b.date) - new Date(a.date)); // newest first by default
+
+const latestDate = Math.max(...posts.map(p => new Date(p.date).getTime()));
+const categories = [...new Set(posts.map(p => p.category))];
+---
+<BaseLayout title="writing">
+  <h1>writing</h1>
+  <p class="subtitle">notes on embedded systems, FPGA, and physics.</p>
+
+  <div class="controls">
+    <div class="tabs" id="category-tabs">
+      <button class="tab active" data-category="all" type="button">all</button>
+      {categories.map(category => (
+        <button class="tab" data-category={category} type="button">{category.toLowerCase()}</button>
+      ))}
+    </div>
+    <button class="sort-toggle" id="sort-toggle" type="button" data-order="desc">
+      newest first
+    </button>
+  </div>
+
+  <div class="timeline" id="timeline">
+    {posts.map(post => (
+      <TimelineEntry
+        title={post.title}
+        description={post.description}
+        date={post.date}
+        category={post.category}
+        tags={post.tags}
+        url={post.url}
+        featured={new Date(post.date).getTime() === latestDate}
+      />
+    ))}
+  </div>
+</BaseLayout>
+
+<script>
+  const tabsContainer = document.getElementById('category-tabs');
+  const timeline = document.getElementById('timeline');
+  const sortToggle = document.getElementById('sort-toggle');
+
+  tabsContainer?.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('.tab') as HTMLElement | null;
+    if (!btn || !timeline) return;
+
+    tabsContainer.querySelectorAll('.tab').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+
+    const category = btn.dataset.category;
+    timeline.querySelectorAll('.entry').forEach(entry => {
+      const el = entry as HTMLElement;
+      const matches = category === 'all' || el.dataset.category === category;
+      el.classList.toggle('hidden', !matches);
+    });
+  });
+
+  sortToggle?.addEventListener('click', () => {
+    if (!timeline) return;
+    const wasAscending = sortToggle.dataset.order === 'asc';
+    const nowAscending = !wasAscending;
+    sortToggle.dataset.order = nowAscending ? 'asc' : 'desc';
+    sortToggle.textContent = nowAscending ? 'oldest first' : 'newest first';
+
+    const entries = [...timeline.querySelectorAll('.entry')] as HTMLElement[];
+    entries.sort((a, b) => {
+      const diff = new Date(a.dataset.date!).getTime() - new Date(b.dataset.date!).getTime();
+      return nowAscending ? diff : -diff;
+    });
+    entries.forEach(entry => timeline.appendChild(entry));
+  });
+</script>
+
+<style>
+  .subtitle {
+    color: var(--color-text-muted);
+    margin-top: -0.5rem;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    padding-bottom: 1.1rem;
+    border-bottom: 1px solid var(--color-border);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.1rem;
+  }
+
+  .tab {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+  }
+
+  .tab:hover {
+    color: var(--color-text);
+  }
+
+  .tab.active {
+    color: var(--color-text);
+    border-bottom-color: var(--color-text);
+  }
+
+  .sort-toggle {
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .sort-toggle:hover {
+    color: var(--color-text);
+  }
+
+  .sort-toggle::before {
+    content: "↕ ";
+  }
+
+  .timeline {
+    position: relative;
+    margin-top: 0.5rem;
+  }
+
+  .timeline::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(5.5rem + 0.625rem);
+    width: 1px;
+    background: var(--color-border);
+  }
+
+  .timeline :global(.entry) {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .timeline :global(.entry:last-child) {
+    border-bottom: none;
+  }
+</style>

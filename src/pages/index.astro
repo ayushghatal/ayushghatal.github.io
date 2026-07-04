@@ -1,17 +1,74 @@
 ---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ActivityGrid from '../components/ActivityGrid.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import PostCard from '../components/PostCard.astro';
+import ReadingRow from '../components/ReadingRow.astro';
+import { projects } from '../data/projects.js';
+import { reading } from '../data/reading.js';
 
+// Pulls every .mdx file out of /writing so the homepage can show the latest 3.
+// This is the only place that needs to know how writing posts are found —
+// edit here if you ever change where posts live.
+const allPosts = Object.values(import.meta.glob('./writing/*.mdx', { eager: true }));
+const posts = allPosts
+  .filter(post => post.frontmatter?.title)
+  .sort((a, b) => new Date(b.frontmatter.date) - new Date(a.frontmatter.date))
+  .slice(0, 3);
 ---
+<BaseLayout>
+  <section class="intro">
+    <h1>Hey, I'm Ayush.</h1>
+    <p>
+      I'm a third-year ECE student in Bengaluru, currently knee-deep in FPGA
+      coursework and building an SPI bridge between an STM32 and a digital
+      filter I wrote in Verilog. When I'm not doing that, I'm slowly working
+      through a physics curriculum I built for myself — mostly out of
+      stubbornness. This site is where both of those live.
+    </p>
+  </section>
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+  <span class="section-label">activity</span>
+  <ActivityGrid />
+
+  <span class="section-label">work</span>
+  <div class="row-list compact">
+    {projects.filter(p => p.featured).map(project => <ProjectCard {...project} />)}
+  </div>
+  <a class="see-all" href="/projects">view all projects &rarr;</a>
+
+  <span class="section-label">writing</span>
+  <div class="row-list compact">
+    {posts.map(post => (
+      <PostCard
+        title={post.frontmatter.title}
+        description={post.frontmatter.description}
+        date={post.frontmatter.date}
+        url={post.url}
+      />
+    ))}
+  </div>
+  <a class="see-all" href="/writing">see all writing &rarr;</a>
+
+  <span class="section-label">currently reading</span>
+  <div class="row-list compact">
+    {reading.map(item => <ReadingRow {...item} />)}
+  </div>
+</BaseLayout>
+
+<style>
+  .intro p {
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    max-width: 34rem;
+    margin-top: 1rem;
+  }
+
+  .see-all {
+    display: inline-block;
+    margin-top: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+  }
+</style>

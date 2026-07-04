@@ -1,0 +1,21 @@
+---
+layout: ../../layouts/PostLayout.astro
+title: "Simulating a Digital Filter Before It Touches Real Hardware"
+description: "Why the FPGA filter project starts entirely in Icarus Verilog and GTKWave, with no dev board involved yet."
+date: 2026-03-01
+category: "FPGA"
+tags: ["fpga", "verilog"]
+---
+
+The plan for the FPGA digital filter project is to get the whole design correct
+in simulation before it ever touches a board. Icarus Verilog compiles the
+testbench and design together; GTKWave shows the resulting waveforms.
+
+This matters more for a filter than for most digital logic, because "correct"
+here isn't just "the FSM reached the right state" — it's a numerical claim
+about frequency response. A simulation lets that claim get checked against a
+known input signal before synthesis, timing closure, or an SPI link to an
+STM32 enter the picture at all.
+
+More detail on the filter architecture and the SPI control interface will
+follow as the design settles.

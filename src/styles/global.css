@@ -1,0 +1,214 @@
+/* ============================================================
+   DESIGN TOKENS
+   Plain black & white. System fonts only — no webfont loading,
+   nothing to configure. Everything about the look of this site
+   is controlled from this one file.
+   ============================================================ */
+
+:root {
+  --color-bg: #000000;
+  --color-bg-raised: #0e0e0e;      /* code header, subtle panels */
+  --color-border: #2a2a2a;         /* hairline dividers */
+  --color-text: #ffffff;
+  --color-text-secondary: #b8b8b8; /* row/list titles at rest — brighter than muted */
+  --color-text-muted: #8a8a8a;     /* descriptions, dates, captions — dimmer */
+
+  --color-code-bg: #0a0a0a;
+  --color-code-header: #131313;
+  --color-code-border: #262626;
+
+  /* Type — system stack only, no webfonts to load */
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  /* Layout */
+  --content-width: 40rem;
+  --radius: 4px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-body);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+}
+
+h1 { font-size: 2.4rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.5rem; }
+h3 { font-size: 1.05rem; font-weight: 600; }
+
+p { margin: 1em 0; }
+
+a {
+  color: var(--color-text);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+a:hover {
+  border-bottom-color: currentColor;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 1px solid var(--color-text);
+  outline-offset: 2px;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--color-bg-raised);
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+  color: var(--color-text);
+}
+
+/* Section labels — small, lowercase, quiet mono labels used instead
+   of big headlines for "work", "writing", "reading", "activity" etc.
+   The top border is what visually separates one section from the next
+   now that individual rows inside a section don't all have dividers. */
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: lowercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  margin: 4rem 0 1.5rem;
+  padding-top: 2.25rem;
+  border-top: 1px solid var(--color-border);
+  display: block;
+}
+
+.section-label:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+/* Plain list rows — no borders/backgrounds by default, just a hairline
+   divider between items. Used on dedicated list pages (/writing, /projects). */
+.row-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: block;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+/* On the homepage, sections are already separated by .section-label's
+   border, so individual rows skip the divider — just tighter spacing
+   and a color hover instead. */
+.row-list.compact .row {
+  border-bottom: none;
+  padding: 0.85rem 0;
+}
+
+/* Code blocks: chrome (header bar, copy button) added by the script
+   in BaseLayout.astro. This just styles the pre/code themselves. */
+pre.astro-code {
+  margin: 0;
+  padding: 1.1rem 1.25rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  background: var(--color-code-bg) !important;
+}
+
+pre.astro-code code {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 2.5rem 0;
+}
+
+blockquote {
+  margin: 1.5rem 0;
+  padding-left: 1rem;
+  border-left: 2px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+::selection {
+  background: var(--color-text);
+  color: var(--color-bg);
+}
+
+/* ---- code block chrome, injected wrapper from BaseLayout script ---- */
+.code-block {
+  border: 1px solid var(--color-code-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin: 1.5rem 0;
+}
+
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background: var(--color-code-header);
+  border-bottom: 1px solid var(--color-code-border);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+}
+
+.code-header .lang {
+  text-transform: lowercase;
+}
+
+.copy-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  cursor: pointer;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.copy-btn:hover {
+  color: var(--color-text);
+  background: var(--color-code-border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; animation: none !important; }
+}
