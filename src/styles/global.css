@@ -122,6 +122,10 @@ code {
   contain-intrinsic-size: auto 90px;
 }
 
+.row:hover {
+  border-bottom-color: var(--color-border);
+}
+
 .row:last-child {
   border-bottom: none;
 }

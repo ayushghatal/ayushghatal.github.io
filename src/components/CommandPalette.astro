@@ -149,6 +149,9 @@ const items = [...pages, ...posts, ...projectPages, ...socials];
 
   const w = window as unknown as { __paletteKeydownBound?: boolean };
   if (!w.__paletteKeydownBound) {
+    let gPending = false;
+    let gTimer: ReturnType<typeof setTimeout> | null = null;
+
     document.addEventListener('keydown', (e) => {
       const isMac = navigator.platform.toUpperCase().includes('MAC');
       const cmdKey = isMac ? e.metaKey : e.ctrlKey;
@@ -163,21 +166,49 @@ const items = [...pages, ...posts, ...projectPages, ...socials];
         return;
       }
 
-      if (!overlay?.classList.contains('open')) return;
+      if (overlay?.classList.contains('open')) {
+        if (e.key === 'Escape') {
+          closePalette();
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          selected = Math.min(selected + 1, visibleItems().length - 1);
+          updateSelection();
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          selected = Math.max(selected - 1, 0);
+          updateSelection();
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          navigate(visibleItems()[selected]);
+        }
+        return;
+      }
 
-      if (e.key === 'Escape') {
-        closePalette();
-      } else if (e.key === 'ArrowDown') {
+      if (e.key.toLowerCase() === 'g' && !cmdKey && !e.altKey && !e.shiftKey) {
+        gPending = true;
+        if (gTimer) clearTimeout(gTimer);
+        gTimer = setTimeout(() => { gPending = false; }, 500);
         e.preventDefault();
-        selected = Math.min(selected + 1, visibleItems().length - 1);
-        updateSelection();
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        selected = Math.max(selected - 1, 0);
-        updateSelection();
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        navigate(visibleItems()[selected]);
+        return;
+      }
+
+      if (gPending) {
+        gPending = false;
+        if (gTimer) clearTimeout(gTimer);
+        switch (e.key.toLowerCase()) {
+          case 'h':
+            e.preventDefault();
+            window.location.href = '/';
+            break;
+          case 'w':
+            e.preventDefault();
+            window.location.href = '/writing';
+            break;
+          case 'p':
+            e.preventDefault();
+            window.location.href = '/projects';
+            break;
+        }
       }
     });
     w.__paletteKeydownBound = true;
