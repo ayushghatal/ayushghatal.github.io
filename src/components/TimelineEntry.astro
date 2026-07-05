@@ -133,4 +133,41 @@ const eyebrow = dateObj.toLocaleDateString("en-US", { month: "long", year: "nume
     color: var(--color-border);
     margin: 0 0.5em;
   }
+
+  @media (max-width: 600px) {
+    .entry {
+      grid-template-columns: 4rem 1rem 1fr;
+      padding: 0.85rem 0;
+    }
+
+    .date-col {
+      padding-right: 0.4rem;
+    }
+
+    .date-col time {
+      font-size: 0.65rem;
+    }
+
+    .marker-col {
+      padding-top: 0.25rem;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-width: 1px;
+    }
+
+    h3 {
+      font-size: 0.95rem;
+    }
+
+    h3.title-lg {
+      font-size: 1.2rem;
+    }
+
+    .description {
+      font-size: 0.85rem;
+    }
+  }
 </style>

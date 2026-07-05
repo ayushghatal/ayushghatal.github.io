@@ -11,7 +11,7 @@ const latestDate = Math.max(...posts.map(p => new Date(p.date).getTime()));
 const categories = [...new Set(posts.map(p => p.category))];
 ---
 <BaseLayout title="writing">
-  <h1>writing</h1>
+  <h1 fetchpriority="high">writing</h1>
   <p class="subtitle">notes on embedded systems, FPGA, and physics.</p>
 
   <div class="controls">
@@ -234,5 +234,20 @@ const categories = [...new Set(posts.map(p => p.category))];
 
   .timeline :global(.entry:last-child) {
     border-bottom: none;
+  }
+
+  @media (max-width: 600px) {
+    .timeline::before {
+      left: calc(4rem + 0.5rem);
+    }
+
+    .controls {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .tabs {
+      gap: 0.9rem;
+    }
   }
 </style>

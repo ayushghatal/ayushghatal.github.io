@@ -281,5 +281,26 @@ const transitionName = postMode
     .toc {
       display: none; /* keep mobile simple — just "return" */
     }
+
+    .shortcut {
+      display: none;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .site-nav,
+    .post-nav {
+      gap: 0.9rem;
+      font-size: 0.78rem;
+    }
+
+    .social {
+      gap: 0.9rem;
+      padding-left: 0.8rem;
+    }
+
+    .palette-btn .kbd {
+      display: none;
+    }
   }
 </style>

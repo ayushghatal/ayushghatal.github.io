@@ -1,130 +1,145 @@
 ---
-import { ViewTransitions } from 'astro:transitions';
-import Nav from '../components/Nav.astro';
-import CommandPalette from '../components/CommandPalette.astro';
-import '../styles/global.css';
-import { site } from '../data/site.js';
+import { ViewTransitions } from "astro:transitions";
+import Nav from "../components/Nav.astro";
+import CommandPalette from "../components/CommandPalette.astro";
+import "../styles/global.css";
+import { site } from "../data/site.js";
 
 const {
-  title,
-  description = site.description,
-  postMode = false,
-  headings = [],
-  backHref = "/writing",
-  ogImage = "/og/default.png",
-  ogType = "website",
+    title,
+    description = site.description,
+    postMode = false,
+    headings = [],
+    backHref = "/writing",
+    ogImage = "/og/default.png",
+    ogType = "website",
 } = Astro.props;
 const pageTitle = title ? `${title} — ${site.name}` : site.name;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const ogImageURL = new URL(ogImage, Astro.site);
 ---
+
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
-    <title>{pageTitle}</title>
-    <meta name="color-scheme" content="dark" />
-    <link rel="canonical" href={canonicalURL} />
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content={description} />
+        <title>{pageTitle}</title>
+        <meta name="color-scheme" content="dark" />
+        <link rel="canonical" href={canonicalURL} />
 
-    <meta property="og:title" content={pageTitle} />
-    <meta property="og:description" content={description} />
-    <meta property="og:type" content={ogType} />
-    <meta property="og:url" content={canonicalURL} />
-    <meta property="og:image" content={ogImageURL} />
-    <meta property="og:site_name" content={site.name} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content={ogType} />
+        <meta property="og:url" content={canonicalURL} />
+        <meta property="og:image" content={ogImageURL} />
+        <meta property="og:site_name" content={site.name} />
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={pageTitle} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImageURL} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={ogImageURL} />
 
-    <ViewTransitions />
-  </head>
-  <body>
-    <Nav postMode={postMode} headings={headings} backHref={backHref} />
-    <CommandPalette />
-    <div class="page">
-      <main>
-        <slot />
-      </main>
-      <footer>
-        <p>&copy; {new Date().getFullYear()} {site.name}. Built with Astro.</p>
-      </footer>
-    </div>
+        <ViewTransitions />
+    </head>
+    <body>
+        <Nav postMode={postMode} headings={headings} backHref={backHref} />
+        <CommandPalette />
+        <div class="page">
+            <main>
+                <slot />
+            </main>
+            <footer>
+                <p>
+                    &copy; {new Date().getFullYear()}
+                    {site.name}. Built with Astro.
+                </p>
+            </footer>
+        </div>
 
-    <script>
-      // Wraps every Shiki code block with a header bar (language label +
-      // copy button). Runs on load and again after each view transition,
-      // since transitions swap the DOM without a full page reload.
-      function setupCodeBlocks() {
-        document.querySelectorAll('pre.astro-code').forEach((pre) => {
-          if (pre.closest('.code-block')) return; // already wrapped
+        <script>
+            // Wraps every Shiki code block with a header bar (language label +
+            // copy button). Runs on load and again after each view transition,
+            // since transitions swap the DOM without a full page reload.
+            function setupCodeBlocks() {
+                document.querySelectorAll("pre.astro-code").forEach((pre) => {
+                    if (pre.closest(".code-block")) return; // already wrapped
 
-          const lang = pre.getAttribute('data-language') || 'text';
+                    const lang = pre.getAttribute("data-language") || "text";
 
-          const wrapper = document.createElement('div');
-          wrapper.className = 'code-block';
+                    const wrapper = document.createElement("div");
+                    wrapper.className = "code-block";
 
-          const header = document.createElement('div');
-          header.className = 'code-header';
+                    const header = document.createElement("div");
+                    header.className = "code-header";
 
-          const langLabel = document.createElement('span');
-          langLabel.className = 'lang';
-          langLabel.textContent = lang;
+                    const langLabel = document.createElement("span");
+                    langLabel.className = "lang";
+                    langLabel.textContent = lang;
 
-          const button = document.createElement('button');
-          button.className = 'copy-btn';
-          button.type = 'button';
-          button.textContent = 'Copy';
-          button.addEventListener('click', async () => {
-            try {
-              await navigator.clipboard.writeText(pre.textContent || '');
-              button.textContent = 'Copied';
-              setTimeout(() => (button.textContent = 'Copy'), 1500);
-            } catch {
-              /* clipboard not available, fail silently */
+                    const button = document.createElement("button");
+                    button.className = "copy-btn";
+                    button.type = "button";
+                    button.textContent = "Copy";
+                    button.addEventListener("click", async () => {
+                        try {
+                            await navigator.clipboard.writeText(
+                                pre.textContent || "",
+                            );
+                            button.textContent = "Copied";
+                            setTimeout(
+                                () => (button.textContent = "Copy"),
+                                1500,
+                            );
+                        } catch {
+                            /* clipboard not available, fail silently */
+                        }
+                    });
+
+                    header.append(langLabel, button);
+                    pre.parentNode.insertBefore(wrapper, pre);
+                    wrapper.append(header, pre);
+                });
             }
-          });
 
-          header.append(langLabel, button);
-          pre.parentNode.insertBefore(wrapper, pre);
-          wrapper.append(header, pre);
-        });
-      }
-
-      document.addEventListener('astro:page-load', setupCodeBlocks);
-    </script>
-  </body>
+            document.addEventListener("astro:page-load", setupCodeBlocks);
+        </script>
+    </body>
 </html>
 
 <style>
-  .page {
-    max-width: var(--content-width);
-    margin: 0 auto;
-    padding: 0 1.5rem;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    padding-top: 3rem;
-  }
-
-  main {
-    flex: 1;
-    padding-bottom: 4rem;
-  }
-
-  footer {
-    padding: 2rem 0;
-    border-top: 1px solid var(--color-border);
-    color: var(--color-text-muted);
-    font-size: 0.8rem;
-  }
-
-  @media (max-width: 900px) {
     .page {
-      padding-top: 0;
+        max-width: var(--content-width);
+        margin: 0 auto;
+        padding: 0 1.5rem;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        padding-top: 5rem;
     }
-  }
+
+    main {
+        flex: 1;
+        padding-bottom: 4rem;
+    }
+
+    footer {
+        padding: 2rem 0;
+        border-top: 1px solid var(--color-border);
+        color: var(--color-text-muted);
+        font-size: 0.8rem;
+    }
+
+    @media (max-width: 900px) {
+        .page {
+            padding-top: 0;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .page {
+            padding: 0 1rem;
+        }
+    }
 </style>

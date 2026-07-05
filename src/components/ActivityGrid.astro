@@ -188,6 +188,24 @@ const cellTemplate = `repeat(${weeks.length}, minmax(0, 1fr))`;
     color: var(--color-text);
   }
 
+  @media (max-width: 600px) {
+    .activity-card {
+      padding: 1rem 1rem 0.9rem;
+      margin: 1rem 0 2rem;
+    }
+
+    .calendar {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 0.5rem;
+    }
+
+    .stat {
+      font-size: 0.85rem;
+      margin-bottom: 0.75rem;
+    }
+  }
+
   .legend {
     display: flex;
     align-items: center;

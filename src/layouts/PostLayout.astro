@@ -202,6 +202,18 @@ const slug = url.split("/").filter(Boolean).pop();
         color: var(--color-text);
     }
 
+    @media (max-width: 600px) {
+        .series-nav {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .series-link.next {
+            grid-column: 1;
+            text-align: left;
+        }
+    }
+
     .related {
         margin-top: 3.5rem;
     }

@@ -197,6 +197,9 @@ code {
   border-collapse: collapse;
   margin: 1.5rem 0;
   font-size: 0.9rem;
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .prose th,
@@ -362,6 +365,38 @@ html {
 .copy-btn:hover {
   color: var(--color-text);
   background: var(--color-code-border);
+}
+
+@media (max-width: 600px) {
+  h1 { font-size: 1.8rem; }
+
+  .section-label {
+    margin: 2.5rem 0 1rem;
+    padding-top: 1.5rem;
+  }
+
+  .prose {
+    font-size: 1rem;
+  }
+
+  .prose h2 {
+    font-size: 1.35rem;
+    margin-top: 2.5rem;
+  }
+
+  .prose h3 {
+    font-size: 1.05rem;
+    margin-top: 1.75rem;
+  }
+
+  .prose table {
+    font-size: 0.8rem;
+  }
+
+  .prose th,
+  .prose td {
+    padding: 0.4rem 0.5rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
