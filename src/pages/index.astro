@@ -13,14 +13,14 @@ const allPosts = Object.values(
     import.meta.glob("./writing/*.mdx", { eager: true }),
 );
 const posts = allPosts
-    .filter((post) => post.frontmatter?.title)
+    .filter((post) => post.frontmatter?.title && !post.frontmatter?.draft)
     .sort((a, b) => new Date(b.frontmatter.date) - new Date(a.frontmatter.date))
     .slice(0, 3);
 
 const projects = Object.values(
     import.meta.glob("./projects/*.mdx", { eager: true }),
 )
-    .filter((p: any) => p.frontmatter?.title)
+    .filter((p: any) => p.frontmatter?.title && !p.frontmatter?.draft)
     .map((p: any) => ({ ...p.frontmatter, url: p.url }))
     .filter((p) => p.featured);
 ---

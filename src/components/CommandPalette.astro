@@ -11,11 +11,11 @@ const pages = [
 ];
 
 const posts = Object.values(import.meta.glob('../pages/writing/*.mdx', { eager: true }))
-  .filter((post: any) => post.frontmatter?.title)
+  .filter((post: any) => post.frontmatter?.title && !post.frontmatter?.draft)
   .map((post: any) => ({ label: post.frontmatter.title, href: post.url, type: "post" }));
 
 const projectPages = Object.values(import.meta.glob('../pages/projects/*.mdx', { eager: true }))
-  .filter((p: any) => p.frontmatter?.title)
+  .filter((p: any) => p.frontmatter?.title && !p.frontmatter?.draft)
   .map((p: any) => ({ label: p.frontmatter.title, href: p.url, type: "project" }));
 
 const socials = [

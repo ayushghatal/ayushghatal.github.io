@@ -3,13 +3,15 @@ import { Resvg } from '@resvg/resvg-js';
 import fs from 'node:fs';
 import { site } from '../../data/site.js';
 
+export const prerender = true;
+
 // Every writing post and every project gets its own image; anything else
 // (home, /writing, /projects, 404) falls back to the "default" one. Adding
 // a new post or project picks this up automatically — nothing to update
 // here.
 export async function getStaticPaths() {
   const posts = Object.values(import.meta.glob('../writing/*.mdx', { eager: true }))
-    .filter((p: any) => p.frontmatter?.title)
+    .filter((p: any) => p.frontmatter?.title && !p.frontmatter?.draft)
     .map((p: any) => ({
       slug: p.url.split('/').filter(Boolean).pop(),
       title: p.frontmatter.title,
@@ -18,7 +20,7 @@ export async function getStaticPaths() {
     }));
 
   const projects = Object.values(import.meta.glob('../projects/*.mdx', { eager: true }))
-    .filter((p: any) => p.frontmatter?.title)
+    .filter((p: any) => p.frontmatter?.title && !p.frontmatter?.draft)
     .map((p: any) => ({
       slug: p.url.split('/').filter(Boolean).pop(),
       title: p.frontmatter.title,

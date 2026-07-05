@@ -1,0 +1,746 @@
+---
+// Standalone CMS — no site layout.
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cms</title>
+  <style is:global>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0a; --bg-r: #111; --bg-h: #161616; --bg-a: #1a1a1a;
+      --bd: #1c1c1c; --bd-l: #262626;
+      --tx: #e5e5e5; --tx2: #aaa; --tx3: #666; --tx4: #444;
+      --accent: #fff; --green: #22c55e; --green-bg: #052e16; --green-bd: #166534;
+      --amber: #f59e0b; --amber-bg: #451a03; --amber-bd: #92400e;
+      --red: #ef4444; --red-bg: #450a0a; --red-bd: #991b1b;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --mono: "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace;
+      --r: 6px; --rs: 4px;
+    }
+    html, body { height: 100%; }
+    body { font-family: var(--font); font-size: 14px; line-height: 1.5; color: var(--tx); background: var(--bg); -webkit-font-smoothing: antialiased; }
+    input, textarea, select, button { font-family: inherit; font-size: inherit; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ===== LOGIN ===== */
+    .login-page { display: flex; align-items: center; justify-content: center; height: 100vh; }
+    .login-card { width: 100%; max-width: 340px; padding: 2.5rem 2rem; }
+    .login-card h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 0.3rem; }
+    .login-card p { color: var(--tx3); font-size: 0.88rem; margin-bottom: 2rem; }
+    .login-btn {
+      display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+      width: 100%; padding: 0.7rem 1rem; background: var(--tx); color: var(--bg);
+      border: none; border-radius: var(--r); font-weight: 600; font-size: 0.88rem;
+      cursor: pointer; transition: opacity 0.15s;
+    }
+    .login-btn:hover { opacity: 0.88; }
+
+    /* ===== APP ===== */
+    .app { display: none; height: 100vh; overflow: hidden; }
+    .app.active { display: grid; grid-template-columns: 220px 1fr; }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      display: flex; flex-direction: column; border-right: 1px solid var(--bd);
+      background: var(--bg); height: 100vh;
+    }
+    .sb-brand {
+      padding: 1.1rem 1.25rem; border-bottom: 1px solid var(--bd);
+    }
+    .sb-brand h1 { font-size: 0.95rem; font-weight: 700; letter-spacing: -0.03em; }
+
+    .sb-nav { padding: 0.6rem 0; flex: 1; }
+    .sb-section { padding: 0.2rem 0.75rem; }
+    .sb-label {
+      font-size: 0.6rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--tx4); padding: 0.5rem 0.5rem 0.3rem;
+    }
+    .sb-link {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.45rem 0.65rem; border-radius: var(--rs);
+      font-size: 0.82rem; color: var(--tx3); cursor: pointer;
+      transition: all 0.1s; border: none; background: none; width: 100%; text-align: left;
+    }
+    .sb-link:hover { color: var(--tx2); background: var(--bg-h); }
+    .sb-link.active { color: var(--tx); background: var(--bg-a); }
+    .sb-link svg { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.5; }
+    .sb-link.active svg { opacity: 0.8; }
+    .sb-link .count {
+      margin-left: auto; font-family: var(--mono); font-size: 0.65rem;
+      color: var(--tx4); background: var(--bg-r); padding: 0.05rem 0.35rem;
+      border-radius: 3px;
+    }
+
+    .sb-divider { height: 1px; background: var(--bd); margin: 0.5rem 0.75rem; }
+
+    .sb-bottom { padding: 0.6rem 0.75rem; border-top: 1px solid var(--bd); }
+    .sb-user {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.45rem 0.5rem; border-radius: var(--rs);
+    }
+    .sb-user img { width: 24px; height: 24px; border-radius: 50%; }
+    .sb-user-info { flex: 1; min-width: 0; }
+    .sb-user-name { font-size: 0.78rem; font-weight: 500; color: var(--tx2); display: block; }
+    .sb-user-role { font-size: 0.65rem; color: var(--tx4); }
+    .sb-footer {
+      display: flex; justify-content: space-between; padding: 0.5rem 1rem;
+      font-size: 0.68rem; border-top: 1px solid var(--bd);
+    }
+    .sb-footer a { color: var(--tx4); transition: color 0.1s; }
+    .sb-footer a:hover { color: var(--tx2); }
+
+    /* ===== MAIN ===== */
+    .main { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+    /* List header */
+    .list-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 1.5rem; border-bottom: 1px solid var(--bd); flex-shrink: 0;
+    }
+    .list-header h2 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.02em; }
+    .list-header-actions { display: flex; gap: 0.4rem; }
+    .search-wrap {
+      position: relative; display: flex; align-items: center;
+    }
+    .search-wrap svg {
+      position: absolute; left: 0.6rem; color: var(--tx4); pointer-events: none;
+    }
+    .search-wrap input {
+      width: 200px; padding: 0.4rem 0.65rem 0.4rem 1.9rem;
+      background: var(--bg-r); border: 1px solid var(--bd); border-radius: var(--rs);
+      color: var(--tx); font-size: 0.8rem; outline: none; transition: all 0.15s;
+    }
+    .search-wrap input:focus { border-color: var(--tx4); width: 260px; }
+    .search-wrap input::placeholder { color: var(--tx4); }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+      padding: 0.42rem 0.85rem; border-radius: var(--rs); border: 1px solid transparent;
+      font-size: 0.8rem; font-weight: 500; cursor: pointer; white-space: nowrap; transition: all 0.1s;
+    }
+    .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .btn-primary { background: var(--accent); color: var(--bg); font-weight: 600; }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-outline { background: none; border-color: var(--bd-l); color: var(--tx2); }
+    .btn-outline:hover { border-color: var(--tx4); color: var(--tx); }
+    .btn-ghost { background: none; color: var(--tx3); }
+    .btn-ghost:hover { color: var(--red); }
+    .btn-back { background: none; border: none; color: var(--tx3); padding: 0.35rem; cursor: pointer; display: flex; border-radius: var(--rs); }
+    .btn-back:hover { color: var(--tx); background: var(--bg-h); }
+
+    /* Post list */
+    .list-body { flex: 1; overflow-y: auto; padding: 1rem 1.5rem; }
+    .list-body::-webkit-scrollbar { width: 5px; }
+    .list-body::-webkit-scrollbar-thumb { background: var(--bd); border-radius: 2px; }
+
+    .post-card {
+      display: flex; align-items: flex-start; gap: 1rem;
+      padding: 1.1rem 1.25rem; margin-bottom: 0.65rem;
+      border: 1px solid #2a2a2a; border-radius: 8px;
+      cursor: pointer; transition: all 0.15s ease;
+      background: #111;
+    }
+    .post-card:hover {
+      border-color: #fff; background: #1a1a1a;
+      box-shadow: 0 2px 12px rgba(255,255,255,0.08);
+    }
+    .post-card.active { border-color: var(--accent); background: #1a1a1a; }
+
+    .pc-status {
+      width: 9px; height: 9px; border-radius: 50%; margin-top: 0.4rem; flex-shrink: 0;
+    }
+    .pc-status.draft { background: var(--amber); }
+    .pc-status.published { background: var(--green); }
+
+    .pc-body { flex: 1; min-width: 0; }
+    .pc-title {
+      font-size: 0.95rem; font-weight: 500; color: var(--tx2); margin-bottom: 0.25rem;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      transition: color 0.15s ease;
+    }
+    .post-card:hover .pc-title { color: #fff; }
+    .post-card.active .pc-title { color: #fff; }
+    .pc-desc {
+      font-size: 0.8rem; color: var(--tx3); line-height: 1.5;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      transition: color 0.15s ease;
+    }
+    .post-card:hover .pc-desc { color: var(--tx2); }
+    .pc-meta {
+      display: flex; align-items: center; gap: 0.6rem; margin-top: 0.5rem;
+      font-family: var(--mono); font-size: 0.68rem; color: var(--tx4);
+    }
+    .pc-tag {
+      padding: 0.1rem 0.45rem; background: #1a1a1a; border: 1px solid #333;
+      border-radius: 3px; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .pc-arrow {
+      color: var(--tx4); opacity: 0; transition: all 0.15s ease; margin-top: 0.35rem; flex-shrink: 0;
+    }
+    .post-card:hover .pc-arrow { opacity: 1; color: #fff; }
+
+    .list-empty {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 4rem 2rem; color: var(--tx4); gap: 0.5rem;
+    }
+    .list-empty svg { opacity: 0.2; }
+    .list-empty p { font-size: 0.88rem; }
+
+    /* ===== EDITOR ===== */
+    .editor-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.55rem 1.25rem; border-bottom: 1px solid var(--bd); flex-shrink: 0; gap: 0.75rem;
+    }
+    .editor-bar-left { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+    .badge {
+      font-family: var(--mono); font-size: 0.62rem; font-weight: 700;
+      padding: 0.15rem 0.5rem; border-radius: 3px; text-transform: uppercase;
+      letter-spacing: 0.05em; flex-shrink: 0;
+    }
+    .badge.draft { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-bd); }
+    .badge.published { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-bd); }
+    .badge.saving { background: var(--bg-r); color: var(--tx3); border: 1px solid var(--bd); }
+    .editor-bar-slug {
+      font-family: var(--mono); font-size: 0.76rem; color: var(--tx4);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .editor-bar-right { display: flex; gap: 0.3rem; flex-shrink: 0; }
+
+    .editor-scroll { flex: 1; overflow-y: auto; padding: 1.5rem 1.75rem; }
+    .editor-scroll::-webkit-scrollbar { width: 5px; }
+    .editor-scroll::-webkit-scrollbar-thumb { background: var(--bd); border-radius: 2px; }
+
+    .ed-section { margin-bottom: 1.75rem; }
+    .ed-section-title {
+      font-size: 0.68rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.07em; color: var(--tx4); margin-bottom: 0.6rem;
+      padding-bottom: 0.35rem; border-bottom: 1px solid var(--bd);
+    }
+    .ed-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .ed-grid .span { grid-column: 1 / -1; }
+    .ed-field { display: flex; flex-direction: column; gap: 0.25rem; }
+    .ed-field label { font-size: 0.73rem; font-weight: 500; color: var(--tx2); }
+    .ed-field input, .ed-field select {
+      padding: 0.45rem 0.65rem; background: var(--bg-r); border: 1px solid var(--bd);
+      border-radius: var(--rs); color: var(--tx); font-size: 0.86rem; outline: none;
+      transition: border-color 0.12s;
+    }
+    .ed-field input:focus, .ed-field select:focus { border-color: var(--tx4); }
+    .ed-field input::placeholder { color: var(--tx4); }
+    .ed-field select {
+      cursor: pointer; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M4.427 6.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 6H4.604a.25.25 0 00-.177.427z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 0.55rem center; padding-right: 1.8rem;
+    }
+    .ed-toggles { display: flex; gap: 1.25rem; margin-top: 0.15rem; }
+    .ed-toggle {
+      display: flex; align-items: center; gap: 0.4rem; cursor: pointer;
+      font-size: 0.8rem; color: var(--tx2); user-select: none;
+    }
+    .ed-toggle input { width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; }
+
+    .ed-content textarea {
+      width: 100%; min-height: 400px; padding: 0.9rem 1rem;
+      background: var(--bg-r); border: 1px solid var(--bd); border-radius: var(--r);
+      color: var(--tx); font-family: var(--mono); font-size: 0.84rem;
+      line-height: 1.7; resize: vertical; outline: none; tab-size: 2;
+      transition: border-color 0.12s;
+    }
+    .ed-content textarea:focus { border-color: var(--tx4); }
+    .ed-content textarea::placeholder { color: var(--tx4); }
+
+    /* ===== MODAL ===== */
+    .modal-bg {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none;
+      align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(2px);
+    }
+    .modal-bg.open { display: flex; }
+    .modal-box {
+      background: var(--bg); border: 1px solid var(--bd); border-radius: 10px;
+      padding: 1.5rem; width: 100%; max-width: 360px; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .modal-box h2 { font-size: 0.95rem; font-weight: 600; margin-bottom: 1.2rem; }
+    .modal-box .ed-grid { grid-template-columns: 1fr; }
+    .modal-btns { display: flex; justify-content: flex-end; gap: 0.3rem; margin-top: 1.25rem; }
+
+    /* ===== TOAST ===== */
+    .toast-box { position: fixed; bottom: 1rem; right: 1rem; z-index: 200; display: flex; flex-direction: column; gap: 0.35rem; pointer-events: none; }
+    .toast {
+      padding: 0.5rem 0.85rem; border-radius: var(--rs); font-size: 0.78rem;
+      font-weight: 500; animation: tUp 0.2s ease; pointer-events: auto;
+    }
+    .toast.success { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-bd); }
+    .toast.error { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-bd); }
+    @keyframes tUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 800px) {
+      .app.active { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .ed-grid { grid-template-columns: 1fr; }
+      .search-wrap input { width: 140px; }
+      .search-wrap input:focus { width: 180px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <div class="login-page" id="login-page">
+    <div class="login-card">
+      <h1>cms</h1>
+      <p>Sign in with GitHub to manage your content.</p>
+      <a href="/api/auth/login">
+        <button class="login-btn" type="button">
+          <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          Sign in with GitHub
+        </button>
+      </a>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div class="app" id="app">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sb-brand"><h1>cms</h1></div>
+      <nav class="sb-nav">
+        <div class="sb-section">
+          <div class="sb-label">Content</div>
+          <button class="sb-link active" data-view="writing" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4z"/></svg>
+            Writing <span class="count" id="count-writing">0</span>
+          </button>
+          <button class="sb-link" data-view="projects" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+            Projects <span class="count" id="count-projects">0</span>
+          </button>
+        </div>
+        <div class="sb-divider"></div>
+        <div class="sb-section">
+          <div class="sb-label">Quick</div>
+          <a class="sb-link" href="/" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+            View site
+          </a>
+        </div>
+      </nav>
+      <div class="sb-bottom">
+        <div class="sb-user">
+          <img id="u-av" src="" alt="" />
+          <div class="sb-user-info">
+            <span class="sb-user-name" id="u-name"></span>
+            <span class="sb-user-role">Admin</span>
+          </div>
+        </div>
+      </div>
+      <div class="sb-footer">
+        <a href="/api/auth/logout">Sign out</a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main" id="main">
+
+      <!-- LIST VIEW -->
+      <div id="list-view">
+        <div class="list-header">
+          <h2 id="list-title">Writing</h2>
+          <div class="list-header-actions">
+            <div class="search-wrap">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" id="search" placeholder="Search..." />
+            </div>
+            <button class="btn btn-primary" id="new-btn" type="button">+ New</button>
+          </div>
+        </div>
+        <div class="list-body" id="post-list"></div>
+      </div>
+
+      <!-- EDITOR VIEW -->
+      <div id="editor-view" style="display:none; flex-direction:column; height:100%;">
+        <div class="editor-bar">
+          <div class="editor-bar-left">
+            <button class="btn-back" id="ed-back" title="Back to list" type="button">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <span class="badge" id="ed-status"></span>
+            <span class="editor-bar-slug" id="ed-slug"></span>
+          </div>
+          <div class="editor-bar-right">
+            <button class="btn btn-ghost" id="ed-delete" type="button">Delete</button>
+            <button class="btn btn-outline" id="ed-save" type="button">Save Draft</button>
+            <button class="btn btn-primary" id="ed-publish" type="button">Publish</button>
+          </div>
+        </div>
+        <div class="editor-scroll">
+          <div class="ed-section">
+            <div class="ed-section-title">General</div>
+            <div class="ed-grid">
+              <div class="ed-field"><label>Title</label><input type="text" id="ed-title" placeholder="Post title" /></div>
+              <div class="ed-field"><label>Slug</label><input type="text" id="ed-slug-input" placeholder="post-slug" /></div>
+              <div class="ed-field span"><label>Description</label><input type="text" id="ed-desc" placeholder="Brief description" /></div>
+              <div class="ed-field"><label>Date</label><input type="date" id="ed-date" /></div>
+              <div class="ed-field"><label>Category</label><input type="text" id="ed-category" placeholder="e.g. Embedded" /></div>
+              <div class="ed-field span"><label>Tags</label><input type="text" id="ed-tags" placeholder="embedded, stm32 (comma separated)" /></div>
+            </div>
+          </div>
+          <div class="ed-section" id="section-writing" style="display:none">
+            <div class="ed-section-title">Series</div>
+            <div class="ed-grid">
+              <div class="ed-field"><label>Series</label><input type="text" id="ed-series" placeholder="Optional series name" /></div>
+              <div class="ed-field"><label>Part</label><input type="number" id="ed-part" placeholder="1" min="1" /></div>
+            </div>
+          </div>
+          <div class="ed-section" id="section-projects" style="display:none">
+            <div class="ed-section-title">Project</div>
+            <div class="ed-grid">
+              <div class="ed-field span"><label>Repo URL</label><input type="text" id="ed-repo" placeholder="https://github.com/..." /></div>
+            </div>
+            <div class="ed-toggles" style="margin-top:0.65rem">
+              <label class="ed-toggle"><input type="checkbox" id="ed-featured" /> Featured on homepage</label>
+            </div>
+          </div>
+          <div class="ed-section">
+            <div class="ed-section-title">Options</div>
+            <div class="ed-toggles">
+              <label class="ed-toggle"><input type="checkbox" id="ed-draft" checked /> Draft</label>
+            </div>
+          </div>
+          <div class="ed-section ed-content">
+            <div class="ed-section-title">Content</div>
+            <textarea id="ed-body" placeholder="Write your Markdown / MDX here..."></textarea>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-bg" id="modal">
+    <div class="modal-box">
+      <h2>New Post</h2>
+      <div class="ed-grid">
+        <div class="ed-field"><label>Slug</label><input type="text" id="m-slug" placeholder="my-new-post" /></div>
+      </div>
+      <div class="modal-btns">
+        <button class="btn btn-outline" id="m-cancel" type="button">Cancel</button>
+        <button class="btn btn-primary" id="m-create" type="button">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-box" id="toasts"></div>
+
+  <script>
+    interface User { login: string; name: string; avatar_url: string; }
+    interface Post { slug: string; collection: string; sha: string; path: string; }
+    interface PostDetail { slug: string; collection: string; sha: string; frontmatter: Record<string, any>; body: string; }
+
+    let user: User | null = null;
+    let posts: Post[] = [];
+    let current: PostDetail | null = null;
+    let view: 'writing' | 'projects' = 'writing';
+    let query = '';
+    const $ = (s: string) => document.querySelector(s) as HTMLElement;
+
+    function escapeHtml(str: string): string {
+      const map: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+      return str.replace(/[&<>"']/g, (ch) => map[ch]);
+    }
+
+    function toast(msg: string, type: 'success' | 'error' = 'success') {
+      const el = document.createElement('div');
+      el.className = `toast ${type}`;
+      el.textContent = msg;
+      $('#toasts').appendChild(el);
+      setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.3s'; setTimeout(() => el.remove(), 300); }, 2500);
+    }
+
+    async function checkAuth() {
+      try {
+        const r = await fetch('/api/auth/me');
+        if (r.ok) {
+          const d = await r.json();
+          user = d.user;
+          $('#u-name').textContent = `@${user!.login}`;
+          $('#u-av').src = user!.avatar_url;
+          $('#login-page').style.display = 'none';
+          $('#app').classList.add('active');
+          loadPosts();
+        }
+      } catch (e) {
+        console.error('Auth check failed:', e);
+      }
+    }
+
+    async function loadPosts() {
+      try {
+        const r = await fetch('/api/posts');
+        if (r.ok) {
+          posts = (await r.json()).posts;
+          const wc = posts.filter(p => p.collection === 'writing').length;
+          const pc = posts.filter(p => p.collection === 'projects').length;
+          $('#count-writing').textContent = String(wc);
+          $('#count-projects').textContent = String(pc);
+          renderList();
+        }
+      } catch { toast('Failed to load posts', 'error'); }
+    }
+
+    function renderList() {
+      const wrap = $('#post-list');
+      const title = $('#list-title');
+      title.textContent = view === 'writing' ? 'Writing' : 'Projects';
+
+      let list = posts.filter(p => p.collection === view);
+      if (query) { const q = query.toLowerCase(); list = list.filter(p => p.slug.includes(q)); }
+      list.sort((a, b) => b.slug.localeCompare(a.slug));
+
+      // Cache to avoid re-hydrating
+      const cache: Record<string, PostDetail> = {};
+
+      if (!list.length) {
+        wrap.innerHTML = `<div class="list-empty">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12h14"/></svg>
+          <p>${query ? 'No matches' : 'No posts yet'}</p>
+        </div>`;
+        return;
+      }
+
+      wrap.innerHTML = list.map(p => `
+        <div class="post-card" data-slug="${escapeHtml(p.slug)}">
+          <div class="pc-status draft" id="dot-${escapeHtml(p.slug)}"></div>
+          <div class="pc-body">
+            <div class="pc-title" id="t-${escapeHtml(p.slug)}">${escapeHtml(p.slug.replace(/-/g, ' '))}</div>
+            <div class="pc-desc" id="desc-${escapeHtml(p.slug)}"></div>
+            <div class="pc-meta">
+              <span class="pc-tag">${escapeHtml(p.collection)}</span>
+              <span id="date-${escapeHtml(p.slug)}"></span>
+            </div>
+          </div>
+          <div class="pc-arrow">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+        </div>
+      `).join('');
+
+      list.forEach(p => hydrateCard(p.slug));
+
+      wrap.querySelectorAll('.post-card').forEach(el => {
+        el.addEventListener('click', () => openPost((el as HTMLElement).dataset.slug!));
+      });
+    }
+
+    async function hydrateCard(slug: string) {
+      try {
+        const r = await fetch(`/api/posts/${slug}`);
+        if (!r.ok) return;
+        const d: PostDetail = await r.json();
+        const fm = d.frontmatter;
+        const t = $(`#t-${CSS.escape(slug)}`);
+        const dot = $(`#dot-${CSS.escape(slug)}`);
+        const desc = $(`#desc-${CSS.escape(slug)}`);
+        const date = $(`#date-${CSS.escape(slug)}`);
+        if (t && fm.title) t.textContent = fm.title;
+        const draft = fm.draft === true || fm.draft === 'true';
+        if (dot) dot.className = `pc-status ${draft ? 'draft' : 'published'}`;
+        if (desc && fm.description) desc.textContent = fm.description;
+        if (date && fm.date) date.textContent = fm.date;
+      } catch (e) {
+        console.error(`Failed to hydrate card ${slug}:`, e);
+      }
+    }
+
+    function showList() {
+      $('#list-view').style.display = '';
+      $('#editor-view').style.display = 'none';
+      current = null;
+      document.querySelectorAll('.post-card').forEach(el => el.classList.remove('active'));
+    }
+
+    function showCollectionFields(collection: string) {
+      $('#section-writing').style.display = collection === 'writing' ? '' : 'none';
+      $('#section-projects').style.display = collection === 'projects' ? '' : 'none';
+    }
+
+    function openPost(slug: string) {
+      $('#list-view').style.display = 'none';
+      $('#editor-view').style.display = 'flex';
+      document.querySelectorAll('.post-card').forEach(el => el.classList.remove('active'));
+      $(`.post-card[data-slug="${CSS.escape(slug)}"]`)?.classList.add('active');
+
+      $('#ed-status').className = 'badge saving'; $('#ed-status').textContent = 'LOADING';
+      $('#ed-slug').textContent = slug;
+      $('#ed-title').value = ''; $('#ed-body').value = '';
+
+      fetch(`/api/posts/${slug}`)
+        .then(r => r.ok ? r.json() : Promise.reject())
+        .then((d: PostDetail) => {
+          current = d;
+          const fm = d.frontmatter;
+          const draft = fm.draft === true || fm.draft === 'true';
+          $('#ed-status').className = `badge ${draft ? 'draft' : 'published'}`;
+          $('#ed-status').textContent = draft ? 'DRAFT' : 'PUBLISHED';
+          $('#ed-slug').textContent = d.slug;
+          $('#ed-slug-input').value = d.slug;
+          $('#ed-title').value = fm.title || '';
+          $('#ed-desc').value = fm.description || '';
+          $('#ed-date').value = fm.date || '';
+          $('#ed-category').value = fm.category || '';
+          $('#ed-tags').value = Array.isArray(fm.tags) ? fm.tags.join(', ') : (fm.tags || '');
+          $('#ed-draft').checked = draft;
+          showCollectionFields(d.collection);
+          if (d.collection === 'projects') {
+            $('#ed-featured').checked = fm.featured === true;
+            $('#ed-repo').value = fm.repo || '';
+          } else {
+            $('#ed-series').value = fm.series || '';
+            $('#ed-part').value = fm.part || '';
+          }
+          $('#ed-body').value = d.body || '';
+        })
+        .catch(() => toast('Failed to load post', 'error'));
+    }
+
+    function gatherFm(): Record<string, any> {
+      const fm: Record<string, any> = {};
+      const t = $('#ed-title').value.trim();
+      const d = $('#ed-desc').value.trim();
+      const dt = $('#ed-date').value;
+      const c = $('#ed-category').value.trim();
+      const tg = $('#ed-tags').value.trim();
+      if (t) fm.title = t;
+      if (d) fm.description = d;
+      if (dt) fm.date = dt;
+      if (c) fm.category = c;
+      if (tg) fm.tags = tg.split(',').map((s: string) => s.trim()).filter(Boolean);
+      fm.draft = $('#ed-draft').checked;
+      const collection = current?.collection || view;
+      if (collection === 'projects') {
+        const f = $('#ed-featured').checked;
+        const r = $('#ed-repo').value.trim();
+        if (f) fm.featured = f;
+        if (r) fm.repo = r;
+      } else {
+        const s = $('#ed-series').value.trim();
+        const p = $('#ed-part').value;
+        if (s) fm.series = s;
+        if (p) fm.part = parseInt(p, 10);
+      }
+      return fm;
+    }
+
+    function setLoading(on: boolean) {
+      ($('#ed-save') as HTMLButtonElement).disabled = on;
+      ($('#ed-publish') as HTMLButtonElement).disabled = on;
+      if (on) { $('#ed-status').className = 'badge saving'; $('#ed-status').textContent = 'SAVING'; }
+    }
+
+    async function save(publish: boolean) {
+      const originalDraft = $('#ed-draft').checked;
+      if (publish) $('#ed-draft').checked = false;
+      const slug = $('#ed-slug-input').value.trim();
+      if (!slug) { toast('Slug is required', 'error'); return; }
+      const collection = current?.collection || view;
+
+      setLoading(true);
+      try {
+        const url = current ? `/api/posts/${current.slug}` : '/api/posts/create';
+        const method = current ? 'PUT' : 'POST';
+        const body = current
+          ? { collection, frontmatter: gatherFm(), content: $('#ed-body').value, sha: current.sha }
+          : { slug, collection, frontmatter: gatherFm(), content: $('#ed-body').value };
+
+        const r = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        if (r.ok) {
+          toast(publish ? 'Published!' : 'Draft saved');
+          current = null;
+          await loadPosts();
+          await openPost(slug);
+        } else {
+          $('#ed-draft').checked = originalDraft;
+          const e = await r.json();
+          toast(e.error || 'Save failed', 'error');
+        }
+      } catch {
+        $('#ed-draft').checked = originalDraft;
+        toast('Network error', 'error');
+      }
+      setLoading(false);
+    }
+
+    async function deletePost() {
+      if (!current) return;
+      if (!confirm('Delete this post?')) return;
+      try {
+        const r = await fetch(`/api/posts/${current.slug}`, {
+          method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ collection: current.collection, sha: current.sha }),
+        });
+        if (r.ok) { toast('Deleted'); showList(); await loadPosts(); }
+        else toast('Delete failed', 'error');
+      } catch { toast('Network error', 'error'); }
+    }
+
+    function openModal() { $('#modal').classList.add('open'); $('#m-slug').value = ''; $('#m-slug').focus(); }
+    function closeModal() { $('#modal').classList.remove('open'); }
+
+    function createPost() {
+      const slug = $('#m-slug').value.trim();
+      if (!slug) { toast('Slug required', 'error'); return; }
+      closeModal();
+      current = null;
+      $('#list-view').style.display = 'none';
+      $('#editor-view').style.display = 'flex';
+      $('#ed-status').className = 'badge draft'; $('#ed-status').textContent = 'DRAFT';
+      $('#ed-slug').textContent = slug;
+      $('#ed-slug-input').value = slug;
+      $('#ed-title').value = ''; $('#ed-desc').value = '';
+      $('#ed-date').value = new Date().toISOString().split('T')[0];
+      $('#ed-category').value = ''; $('#ed-tags').value = '';
+      $('#ed-draft').checked = true;
+      showCollectionFields(view);
+      if (view === 'projects') { $('#ed-featured').checked = false; $('#ed-repo').value = ''; }
+      else { $('#ed-series').value = ''; $('#ed-part').value = ''; }
+      $('#ed-body').value = '';
+    }
+
+    // Init
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+
+      // Sidebar nav
+      document.querySelectorAll('.sb-link[data-view]').forEach(link => {
+        link.addEventListener('click', () => {
+          document.querySelectorAll('.sb-link[data-view]').forEach(l => l.classList.remove('active'));
+          link.classList.add('active');
+          view = (link as HTMLElement).dataset.view as 'writing' | 'projects';
+          showList();
+          renderList();
+        });
+      });
+
+      $('#search').addEventListener('input', (e) => { query = (e.target as HTMLInputElement).value; renderList(); });
+      $('#new-btn').addEventListener('click', openModal);
+      $('#m-cancel').addEventListener('click', closeModal);
+      $('#m-create').addEventListener('click', createPost);
+      $('#modal').addEventListener('click', (e) => { if (e.target === $('#modal')) closeModal(); });
+      $('#ed-back').addEventListener('click', () => { showList(); renderList(); });
+      $('#ed-save').addEventListener('click', () => save(false));
+      $('#ed-publish').addEventListener('click', () => save(true));
+      $('#ed-delete').addEventListener('click', deletePost);
+
+      document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); if ($('#editor-view').style.display !== 'none') save(false); }
+        if (e.key === 'Escape') { if ($('#modal').classList.contains('open')) closeModal(); else if ($('#editor-view').style.display !== 'none') { showList(); renderList(); } }
+      });
+    });
+  </script>
+</body>
+</html>

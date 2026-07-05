@@ -16,7 +16,7 @@ const formatted = frontmatter.date
 const allPosts = Object.values(
     import.meta.glob("../pages/writing/*.mdx", { eager: true }),
 )
-    .filter((p: any) => p.frontmatter?.title)
+    .filter((p: any) => p.frontmatter?.title && !p.frontmatter?.draft)
     .map((p: any) => ({
         ...p.frontmatter,
         category: p.frontmatter.category || "General",

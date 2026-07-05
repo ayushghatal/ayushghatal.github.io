@@ -3,7 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 
 const projects = Object.values(import.meta.glob('./*.mdx', { eager: true }))
-  .filter(post => post.frontmatter?.title)
+  .filter(post => post.frontmatter?.title && !post.frontmatter?.draft)
   .map(post => ({ ...post.frontmatter, url: post.url }))
   .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 ---
