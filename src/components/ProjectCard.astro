@@ -1,84 +1,95 @@
 ---
-import { Image } from 'astro:assets';
-
-// `image`, if provided, should be an imported image (see README — "Adding
-// a project image") — that's what lets Astro generate an optimized,
-// properly-sized file instead of shipping the original asset as-is.
-const { title, description, tags = [], link = "#", image } = Astro.props;
+// `image`, if provided, is a plain path into /public (e.g. "/projects/thumb.png") —
+// frontmatter is just YAML, so it can't hold an imported/optimized image object.
+// For real optimized images (diagrams, screenshots), put them directly in the
+// project's .mdx body with standard Markdown syntax instead — see README.
+const { title, description, tags = [], link, image } = Astro.props;
 ---
+
 <a class="row" href={link}>
-  {image && (
-    <Image src={image} alt={`Screenshot of ${title}`} width={640} height={360} class="project-image" />
-  )}
-  <div class="row-top">
-    <h3>{title}</h3>
-    <span class="arrow">&rarr;</span>
-  </div>
-  <p>{description}</p>
-  {tags.length > 0 && (
-    <p class="tags">
-      {tags.map((tag, i) => (
-        <>
-          {i > 0 && <span class="sep">&middot;</span>}
-          <span>{tag.toLowerCase()}</span>
-        </>
-      ))}
-    </p>
-  )}
+    {
+        image && (
+            <img
+                src={image}
+                alt={`Screenshot of ${title}`}
+                class="project-image"
+                loading="lazy"
+            />
+        )
+    }
+    <div class="row-top">
+        <h3>{title}</h3>
+        <span class="arrow">&rarr;</span>
+    </div>
+    <p>{description}</p>
+    {
+        tags.length > 0 && (
+            <p class="tags">
+                {tags.map((tag, i) => (
+                    <>
+                        {i > 0 && <span class="sep">&middot;</span>}
+                        <span>{tag.toLowerCase()}</span>
+                    </>
+                ))}
+            </p>
+        )
+    }
 </a>
 
 <style>
-  .project-image {
-    width: 100%;
-    height: auto;
-    border-radius: var(--radius);
-    margin-bottom: 0.75rem;
-    display: block;
-  }
+    .project-image {
+        width: 100%;
+        height: auto;
+        border-radius: var(--radius);
+        margin-bottom: 0.75rem;
+        display: block;
+    }
 
-  .row-top {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-  }
+    .row-top {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 1rem;
+    }
 
-  h3 {
-    margin: 0;
-    color: var(--color-text-secondary);
-    transition: color 0.15s ease;
-  }
+    h3 {
+        margin: 0;
+        color: var(--color-text-secondary);
+        transition: color 0.15s ease;
+    }
 
-  .row:hover h3 {
-    color: var(--color-text);
-  }
+    .row:hover h3 {
+        color: var(--color-text);
+    }
 
-  .arrow {
-    color: var(--color-text-muted);
-    opacity: 0;
-    transform: translateX(-4px);
-    transition: opacity 0.15s ease, transform 0.15s ease;
-  }
+    .arrow {
+        color: var(--color-text-muted);
+        opacity: 0;
+        transform: translateX(-4px);
+        transition:
+            opacity 0.15s ease,
+            transform 0.15s ease;
+    }
 
-  .row:hover .arrow {
-    opacity: 1;
-    transform: translateX(0);
-  }
+    .row:hover .arrow {
+        opacity: 1;
+        transform: translateX(0);
+    }
 
-  p {
-    margin: 0.35rem 0 0;
-    color: var(--color-text-muted);
-    font-size: 0.92rem;
-  }
+    p {
+        margin: 0.35rem 0 0;
+        color: var(--color-text-muted);
+        font-size: 0.92rem;
+    }
 
-  .tags {
-    margin-top: 0.6rem;
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-  }
+    .tags {
+        margin-top: 0.6rem;
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+    }
 
-  .sep {
-    color: var(--color-border);
-    margin: 0 0.45em;
-  }
+    .sep {
+        color: var(--color-border);
+        margin: 0 0.45em;
+    }
 </style>

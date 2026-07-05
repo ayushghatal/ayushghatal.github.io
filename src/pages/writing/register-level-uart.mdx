@@ -47,4 +47,5 @@ USART2->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE;
 
 That's the whole peripheral, no abstraction layer in between. Once this is
 working, wrapping it in a small `debug_print()` function is the natural next
-step — that's what turned into the debug UART library linked on the homepage.
+step — that's what turned into the [debug UART
+library](/projects/debug-uart-library).

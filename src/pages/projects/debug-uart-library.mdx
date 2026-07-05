@@ -1,0 +1,35 @@
+---
+layout: ../../layouts/ProjectLayout.astro
+title: "Bare-Metal Debug UART Library"
+description: "A self-contained UART debug library for STM32G0, written at the register level without HAL — clock tree setup, USART2, and NVIC configured by hand."
+tags: ["STM32", "Embedded C", "Bare-metal"]
+featured: true
+date: 2026-06-10
+repo: "#"
+---
+
+## Why not just use HAL
+
+Most STM32 tutorials reach for `HAL_UART_Init()` on the first line, which is
+fine for getting something on screen quickly but skips over exactly the
+parts worth understanding — which clock is actually feeding the peripheral,
+why a pin needs an alternate-function number and not just "output mode,"
+and what the NVIC is doing before an interrupt handler ever runs.
+
+This library configures all of that directly: `RCC` for the clock tree,
+`GPIO` alternate-function registers for the pins, `USART2` for the baud rate
+and enable bits, and `NVIC`/`EXTI` where interrupts are involved. Full
+walkthrough in ["Setting Up UART on STM32G0 Without HAL"](/writing/register-level-uart).
+
+## Why it's self-contained
+
+The project it was built for had include-path issues that made pulling in
+external headers unreliable, so the library has no dependencies outside
+`stdint.h` — just `volatile uint32_t` pointer macros for every register it
+touches.
+
+## Where it's used
+
+This is the debug backbone for the [FPGA filter / SPI
+project](/projects/fpga-spi-filter) — every register write on the STM32 side
+gets logged over this UART during bring-up.

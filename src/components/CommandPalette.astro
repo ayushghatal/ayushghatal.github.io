@@ -14,13 +14,17 @@ const posts = Object.values(import.meta.glob('../pages/writing/*.mdx', { eager: 
   .filter((post: any) => post.frontmatter?.title)
   .map((post: any) => ({ label: post.frontmatter.title, href: post.url, type: "post" }));
 
+const projectPages = Object.values(import.meta.glob('../pages/projects/*.mdx', { eager: true }))
+  .filter((p: any) => p.frontmatter?.title)
+  .map((p: any) => ({ label: p.frontmatter.title, href: p.url, type: "project" }));
+
 const socials = [
   { label: "github", href: site.social.github, type: "social", external: true },
   { label: "mail", href: site.social.email, type: "social", external: false },
   { label: "linkedin", href: site.social.linkedin, type: "social", external: true },
 ];
 
-const items = [...pages, ...posts, ...socials];
+const items = [...pages, ...posts, ...projectPages, ...socials];
 ---
 <div class="palette-overlay" id="palette-overlay">
   <div class="palette" role="dialog" aria-modal="true" aria-label="Command palette">
@@ -141,7 +145,6 @@ const items = [...pages, ...posts, ...socials];
     trigger?.addEventListener('click', openPalette);
   }
 
-  setupPalette();
   document.addEventListener('astro:page-load', setupPalette);
 
   const w = window as unknown as { __paletteKeydownBound?: boolean };

@@ -31,25 +31,31 @@ Then open http://localhost:4321
 ```
 src/
   pages/
-    index.astro           ← homepage (intro, activity, work, writing, reading)
-    projects.astro         ← "all projects" page
+    index.astro           ← homepage (intro, now, activity, work, writing, reading)
+    404.astro               ← custom not-found page
     writing/
-      index.astro           ← "all writing" page, filterable + sortable
+      index.astro           ← "all writing" page, filterable + sortable + searchable
       *.mdx                  ← YOUR POSTS GO HERE, one file per post
+    projects/
+      index.astro           ← "all projects" page
+      *.mdx                  ← YOUR PROJECTS GO HERE, one file per project (with real content)
+    og/
+      [slug].png.ts          ← generates a real social-preview image per post/project at build time
   data/
-    site.js                 ← your name + GitHub username, used everywhere
-    projects.js              ← edit this array to change project entries
+    site.js                 ← your name, GitHub username, social links — used everywhere
     reading.js                ← your physics reading list (the "bookshelf" section)
     activity.js               ← fallback activity data (used only if the GitHub fetch fails)
   layouts/
-    BaseLayout.astro         ← page shell: sidebar + content column, fonts, code-block script
-    PostLayout.astro          ← wraps every writing post (title, date, category, tags)
+    BaseLayout.astro         ← page shell: nav, command palette, OG tags, code-block script
+    PostLayout.astro          ← wraps every writing post (series, related posts, prose)
+    ProjectLayout.astro        ← wraps every project page (repo link, related projects, prose)
   components/
-    Nav.astro                 ← the sidebar itself (fixed on desktop, top bar on mobile)
+    Nav.astro                 ← the floating nav (site links + socials, or return + TOC on posts)
+    CommandPalette.astro       ← the ⌘K quick-jump palette
     ProjectCard.astro, PostCard.astro, ActivityGrid.astro,
     TimelineEntry.astro, ReadingRow.astro
   styles/
-    global.css                ← ALL colors, fonts, and shared row/label styles live here
+    global.css                ← ALL colors, fonts, and shared row/label/prose styles live here
 ```
 
 ## Writing a new post
@@ -71,9 +77,46 @@ Your content here, in Markdown. Code blocks get syntax highlighting and a
 Claude-style header bar (language + copy button) automatically.
 ```
 
-The post shows up on `/writing` — grouped under its `category` — and (if
-recent) on the homepage, automatically. No extra registration step. Delete
-the file to remove it.
+The post shows up on `/writing`, the ⌘K command palette, and (if recent) the
+homepage, automatically. No extra registration step. Delete the file to
+remove it. It also gets its own social-preview image for free — see "Social
+preview images" below.
+
+### Multi-part series
+
+Add `series` and `part` to link posts into a sequence:
+
+```md
+series: "STM32 Bare-Metal"
+part: 2
+```
+
+Any post sharing the same `series` string becomes part of that series,
+ordered by `part`. A "part N of M" note appears next to the date, and
+prev/next links appear at the end of the post — but only once a series has
+more than one part; a single post with a `series` field but no siblings
+doesn't show anything extra, so there's no cost to adding it early.
+
+### Related posts
+
+Every post automatically gets a "related" block at the end listing up to 3
+other posts that share its `category` — no manual linking needed. This is
+separate from series navigation: series is "read these in order," related
+is "you might also like these."
+
+### Footnotes
+
+Standard Markdown footnote syntax works out of the box:
+
+```md
+Some claim that needs a citation.[^1]
+
+[^1]: The citation itself, rendered in a numbered list at the end of the post.
+```
+
+This isn't the Tufte-style margin sidenote (there's no side margin to put
+one in, given the floating nav) — it's a classic numbered footnote with a
+jump-to-note link and a "↩" back-link, styled to match the rest of the site.
 
 ### How the writing page works
 
@@ -83,6 +126,8 @@ themselves:
 - **Category tabs** at the top ("all", plus one per category found in your
   posts) filter the list client-side — plain text, underline for the active
   one, no pill buttons.
+- **The search box** filters by title + description, and works together
+  with the category tabs (both narrow the same list at once).
 - **The sort toggle** ("newest first" / "oldest first") flips the order of
   the whole list on click.
 - The single most recent post *site-wide* still gets the larger "latest"
@@ -96,21 +141,38 @@ This is all plain JavaScript in a `<script>` tag at the bottom of
 
 ## Adding a project
 
-Open `src/data/projects.js` and add an object to the array:
+Projects work exactly like posts now — each one is its own file under
+`src/pages/projects/`, with a real page (content, table of contents, its own
+social-preview image) instead of just a one-line description. Copy
+`src/pages/projects/fpga-spi-filter.mdx`, rename it, and edit the
+frontmatter:
 
-```js
-{
-  title: "Project Name",
-  description: "One or two sentences.",
-  tags: ["Tag1", "Tag2"],
-  link: "https://github.com/you/repo", // or "/writing/your-writeup"
-  featured: true, // shows on the homepage; false = only on /projects
-}
+```md
+---
+layout: ../../layouts/ProjectLayout.astro
+title: "Project Name"
+description: "One or two sentences — shown on cards and as the page subtitle."
+tags: ["Tag1", "Tag2"]
+featured: true    # shows on the homepage; false = only on /projects
+date: 2026-07-03
+repo: "https://github.com/you/repo"   # optional — shows as "view source →"
+---
+
+Write about the project here. What it does, why you built it, what was
+hard. `##` headings show up in the floating table of contents, same as a
+writing post.
 ```
 
-Projects render as plain list rows (title, description, tags as lowercase
-text) — no cards, no colored badges. That's intentional; it's the same
-treatment writing entries get.
+Two projects sharing a tag automatically show up in each other's "related"
+block — same mechanism as related posts, just matched by tag instead of
+category. Cross-link between a project and the post that documents it with
+a normal Markdown link (see how `fpga-spi-filter.mdx` and
+`register-level-uart.mdx` reference each other) — there's no special syntax,
+just `[link text](/projects/other-project)` or `[link text](/writing/other-post)`.
+
+Projects render as plain list rows on `/projects` and the homepage (title,
+description, tags as lowercase text) — no cards, no colored badges. That's
+intentional; it's the same treatment writing entries get.
 
 ## The reading list ("currently reading")
 
@@ -125,6 +187,16 @@ reading, kept deliberately simple: just title, author, status. Edit
   status: "queued", // reading | queued | evaluating | done
 }
 ```
+
+## Social preview images
+
+`src/pages/og/[slug].png.ts` generates a real PNG (1200×630, matching the
+site's black/white look) for every post and every project at build time —
+this is what shows up when a link to your site is shared on Twitter,
+LinkedIn, iMessage, etc. It reads straight from each file's `title` and
+`description`, so there's nothing to maintain per-post; add a post or
+project and its image exists on the next build. Everything else (home,
+`/writing`, `/projects`, 404) shares one default image.
 
 ## Homepage row styling vs. list pages
 
@@ -150,13 +222,33 @@ viewport (`src/components/Nav.astro`) — no top bar, no full-height sidebar.
   plus a table of contents built from that post's `##` headings — no manual
   setup, it reads them straight from the MDX file. As you scroll, the
   section you're currently reading highlights in the TOC via
-  `IntersectionObserver`. This re-initializes on every client-side page
-  navigation (Astro's View Transitions), not just a hard reload — without
-  that, the highlight would stop working after the first post you visit.
+  `IntersectionObserver`, with a small indicator bar that slides to track
+  it — a more tactile connection between scrolling and the nav than just a
+  color change. This re-initializes on every client-side page navigation
+  (Astro's View Transitions), not just a hard reload — without that, the
+  highlight would stop working after the first post you visit.
 - Below 900px width it drops to a plain horizontal bar above the content
   (the TOC hides on mobile to keep things simple — just "return" stays).
 
 Add/remove site-wide links in the `links` array near the top of that file.
+
+### A note on the scripts in this project
+
+Every interactive script (nav highlighting, TOC scroll-spy, the command
+palette, code-block copy buttons, the writing page's filter/sort/search)
+follows the same pattern: define a setup function, and call it *only* via
+`document.addEventListener('astro:page-load', setupThing)` — never also call
+it directly. `astro:page-load` already fires on the very first page load, not
+just after transitions, so calling a setup function both directly *and* via
+that listener double-binds every event handler inside it. For a filter
+button that just sets a class, double-binding is invisible (applying the
+same state twice looks like applying it once). For a toggle that flips state
+— like the sort button — double-binding means one click fires the handler
+twice, which flips it back to where it started. That was the actual sort
+bug: it looked identical to the working filter buttons in every way except
+that it wasn't idempotent under a duplicate call. If you add your own
+interactive script to this site, follow the same pattern (listener only, no
+direct call) or you'll hit the same class of bug.
 
 ### Why the nav is persisted, and how the active link stays correct
 
@@ -217,21 +309,23 @@ what you're actively working on this week. It's just a paragraph in
 focus changes. Deliberately not a whole separate page; it's meant to be
 low-effort enough that you'll actually keep it current.
 
-## Adding a project image
+## Adding images
 
-`ProjectCard.astro` already supports an optional image via Astro's built-in
-`<Image />` component, which generates a properly-sized, optimized file at
-build time instead of shipping your original screenshot as-is. To use it:
+Two different things here, since a project's frontmatter is plain YAML and
+can't hold an imported/optimized image:
 
-1. Put the image under `src/assets/` (e.g. `src/assets/projects/filter-demo.png`).
-2. Import it at the top of `src/data/projects.js`:
-   ```js
-   import filterDemo from '../assets/projects/filter-demo.png';
-   ```
-3. Add `image: filterDemo` to that project's entry.
-
-No `image` key means the card just skips the image — every current project
-entry works fine as-is.
+- **A thumbnail on the card** (shown on `/projects` and the homepage): put
+  the file in `public/` (e.g. `public/projects/thumb.png`) and set
+  `image: "/projects/thumb.png"` in that project's frontmatter. This is a
+  plain, unoptimized `<img>` — fine for a small thumbnail.
+- **Real content images** (diagrams, screenshots, waveform captures) inside
+  a post or project's actual writing: put the file under `src/assets/` and
+  reference it with normal Markdown syntax —
+  `![GTKWave output](../../assets/filter-waveform.png)`. Astro automatically
+  optimizes these (resizes, converts to modern formats, lazy-loads) even
+  though they're plain Markdown, no extra setup needed. This is the one that
+  actually matters for the "biggest lever for a fast page" advice below —
+  use it for anything substantial.
 
 ## Sitemap and robots.txt
 
@@ -312,13 +406,25 @@ in `astro.config.mjs` (`shikiConfig.theme`, currently `vitesse-dark`) — any
 - Name and GitHub username: `src/data/site.js`.
 - Nav links: the `links` array at the top of `src/components/Nav.astro`.
 
+## Scroll feel
+
+A couple of small, deliberate touches:
+
+- Post headings have `scroll-margin-top`, so clicking a TOC link (or any
+  anchor link) lands the heading with a bit of breathing room instead of
+  jammed against the very top of the viewport.
+- The TOC's sliding indicator (see "The floating nav" above) is the other
+  half of this — it ties the act of scrolling to a visible, continuous
+  response in the nav rather than a static list sitting off to the side.
+
 ## Performance notes
 
 - Every list of rows (projects, writing, reading) has `content-visibility:
   auto` — the browser skips layout/paint work for rows that are off-screen.
   Doesn't matter yet at 3 posts; matters once you have 50.
-- Use `<Image />` (see "Adding a project image" above) for anything you add
-  going forward — it's the single biggest lever for keeping the site fast,
-  since unoptimized images are the most common cause of a slow page.
+- Use Astro's automatic Markdown image optimization (see "Adding images"
+  above) for anything you add going forward — it's the single biggest lever
+  for keeping the site fast, since unoptimized images are the most common
+  cause of a slow page.
 - View Transitions + the persisted nav mean navigation never re-downloads or
   re-parses the nav's CSS/JS — only the page content actually changes.

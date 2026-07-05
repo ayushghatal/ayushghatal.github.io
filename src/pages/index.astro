@@ -4,17 +4,21 @@ import ActivityGrid from '../components/ActivityGrid.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import PostCard from '../components/PostCard.astro';
 import ReadingRow from '../components/ReadingRow.astro';
-import { projects } from '../data/projects.js';
 import { reading } from '../data/reading.js';
 
-// Pulls every .mdx file out of /writing so the homepage can show the latest 3.
-// This is the only place that needs to know how writing posts are found —
-// edit here if you ever change where posts live.
+// Pulls every .mdx file out of /writing and /projects so the homepage can
+// show the latest posts and the featured projects. This is the only place
+// that needs to know how those are found — edit here if that ever changes.
 const allPosts = Object.values(import.meta.glob('./writing/*.mdx', { eager: true }));
 const posts = allPosts
   .filter(post => post.frontmatter?.title)
   .sort((a, b) => new Date(b.frontmatter.date) - new Date(a.frontmatter.date))
   .slice(0, 3);
+
+const projects = Object.values(import.meta.glob('./projects/*.mdx', { eager: true }))
+  .filter((p: any) => p.frontmatter?.title)
+  .map((p: any) => ({ ...p.frontmatter, url: p.url }))
+  .filter(p => p.featured);
 ---
 <BaseLayout>
   <section class="intro">
@@ -38,7 +42,7 @@ const posts = allPosts
 
   <span class="section-label">work</span>
   <div class="row-list compact">
-    {projects.filter(p => p.featured).map(project => <ProjectCard {...project} />)}
+    {projects.map(project => <ProjectCard {...project} />)}
   </div>
   <a class="see-all" href="/projects">view all projects &rarr;</a>
 

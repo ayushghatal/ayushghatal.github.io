@@ -1,0 +1,124 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+const { frontmatter, headings, url } = Astro.props;
+const formatted = frontmatter.date
+  ? new Date(frontmatter.date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+  : null;
+
+const allProjects = Object.values(import.meta.glob('../pages/projects/*.mdx', { eager: true }))
+  .filter((p: any) => p.frontmatter?.title)
+  .map((p: any) => ({ ...p.frontmatter, url: p.url }));
+
+const tags = frontmatter.tags ?? [];
+const related = allProjects
+  .filter(p => p.url !== url && (p.tags ?? []).some((t: string) => tags.includes(t)))
+  .slice(0, 3);
+
+const metaParts = [formatted, ...tags].filter(Boolean);
+const slug = url.split('/').filter(Boolean).pop();
+---
+<BaseLayout
+  title={frontmatter.title}
+  description={frontmatter.description}
+  postMode={true}
+  headings={headings}
+  backHref="/projects"
+  ogType="article"
+  ogImage={`/og/${slug}.png`}
+>
+  <article>
+    <header>
+      <p class="meta">
+        {metaParts.map((part, i) => (
+          <>
+            {i > 0 && <span class="sep">&middot;</span>}
+            <span>{part}</span>
+          </>
+        ))}
+      </p>
+      <h1>{frontmatter.title}</h1>
+      {frontmatter.description && <p class="description">{frontmatter.description}</p>}
+      {frontmatter.repo && (
+        <a class="repo-link" href={frontmatter.repo} target="_blank" rel="noopener">
+          view source &rarr;
+        </a>
+      )}
+    </header>
+
+    <div class="prose">
+      <slot />
+    </div>
+
+    {related.length > 0 && (
+      <div class="related">
+        <span class="section-label">related</span>
+        <div class="row-list">
+          {related.map(project => (
+            <a class="row related-row" href={project.url}>
+              <h3>{project.title}</h3>
+              <p>{project.description}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+  </article>
+</BaseLayout>
+
+<style>
+  .meta {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin: 0 0 0.75rem;
+  }
+
+  .sep {
+    color: var(--color-border);
+    margin: 0 0.5em;
+  }
+
+  h1 {
+    margin: 0 0 0.5rem;
+  }
+
+  .description {
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+    margin-top: 0;
+  }
+
+  .repo-link {
+    display: inline-block;
+    margin-top: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+  }
+
+  .repo-link:hover {
+    color: var(--color-text);
+  }
+
+  .related {
+    margin-top: 3.5rem;
+  }
+
+  .related-row h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    transition: color 0.15s ease;
+  }
+
+  .related-row:hover h3 {
+    color: var(--color-text);
+  }
+
+  .related-row p {
+    margin: 0.35rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+  }
+</style>

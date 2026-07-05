@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+
+const projects = Object.values(import.meta.glob('./*.mdx', { eager: true }))
+  .filter(post => post.frontmatter?.title)
+  .map(post => ({ ...post.frontmatter, url: post.url }))
+  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+---
+<BaseLayout title="projects">
+  <h1>projects</h1>
+  <p class="subtitle">everything I've built, in one place.</p>
+
+  <div class="row-list">
+    {projects.map(project => <ProjectCard {...project} />)}
+  </div>
+</BaseLayout>
+
+<style>
+  .subtitle {
+    color: var(--color-text-muted);
+    margin-top: -0.5rem;
+  }
+</style>

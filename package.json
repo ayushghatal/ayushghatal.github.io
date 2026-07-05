@@ -11,6 +11,9 @@
   "dependencies": {
     "@astrojs/mdx": "^3.1.0",
     "@astrojs/sitemap": "3.2.1",
-    "astro": "^4.16.0"
+    "@fontsource/inter": "^5.2.8",
+    "@resvg/resvg-js": "^2.6.2",
+    "astro": "^4.16.0",
+    "satori": "^0.26.0"
   }
 }

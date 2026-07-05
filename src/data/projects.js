@@ -9,7 +9,7 @@ export const projects = [
     description:
       "An FPGA-based digital filter (simulated in Icarus Verilog / GTKWave) controlled over SPI by an STM32G0 running bare-metal firmware.",
     tags: ["FPGA", "Verilog", "STM32", "SPI"],
-    link: "#",
+    link: "/projects/fpga-spi-filter",
     featured: true,
   },
   {
@@ -22,7 +22,8 @@ export const projects = [
   },
   {
     title: "Project Three",
-    description: "Short one-line description of what this project does and why you built it.",
+    description:
+      "Short one-line description of what this project does and why you built it.",
     tags: ["Tag1", "Tag2"],
     link: "#",
     featured: false,

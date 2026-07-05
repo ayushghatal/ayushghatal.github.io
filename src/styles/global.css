@@ -134,6 +134,86 @@ code {
   padding: 0.85rem 0;
 }
 
+/* Long-form article body — shared by post and project detail pages. */
+.prose {
+  margin-top: 3rem;
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
+.prose img {
+  max-width: 100%;
+  border-radius: var(--radius);
+}
+
+.prose h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-top: 3.25rem;
+  margin-bottom: 1rem;
+  scroll-margin-top: 2rem;
+}
+
+.prose h2:first-child {
+  margin-top: 0;
+}
+
+.prose h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-top: 2.25rem;
+  margin-bottom: 0.75rem;
+  scroll-margin-top: 2rem;
+}
+
+.prose p {
+  margin: 1.1em 0;
+  color: var(--color-text-secondary);
+}
+
+/* Footnotes (standard Markdown [^1] syntax, rendered by remark-gfm). */
+.prose .footnotes {
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+}
+
+.prose .footnotes h2 {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  text-transform: lowercase;
+  letter-spacing: 0.03em;
+  font-weight: 400;
+  margin: 0 0 1rem;
+  color: var(--color-text-muted);
+  border: none;
+}
+
+.prose .footnotes ol {
+  padding-left: 1.25rem;
+}
+
+.prose .footnotes li {
+  margin: 0.5rem 0;
+}
+
+.prose .footnotes p {
+  display: inline;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.prose .data-footnote-backref {
+  color: var(--color-text-muted);
+}
+
+.prose sup a {
+  color: var(--color-text);
+  border-bottom: none;
+}
+
 /* Code blocks: chrome (header bar, copy button) added by the script
    in BaseLayout.astro. This just styles the pre/code themselves. */
 pre.astro-code {

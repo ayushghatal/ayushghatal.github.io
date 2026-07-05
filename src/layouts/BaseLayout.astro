@@ -11,8 +11,12 @@ const {
   postMode = false,
   headings = [],
   backHref = "/writing",
+  ogImage = "/og/default.png",
+  ogType = "website",
 } = Astro.props;
 const pageTitle = title ? `${title} — ${site.name}` : site.name;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImageURL = new URL(ogImage, Astro.site);
 ---
 <!doctype html>
 <html lang="en">
@@ -22,6 +26,20 @@ const pageTitle = title ? `${title} — ${site.name}` : site.name;
     <meta name="description" content={description} />
     <title>{pageTitle}</title>
     <meta name="color-scheme" content="dark" />
+    <link rel="canonical" href={canonicalURL} />
+
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:site_name" content={site.name} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
+
     <ViewTransitions />
   </head>
   <body>
@@ -76,7 +94,6 @@ const pageTitle = title ? `${title} — ${site.name}` : site.name;
         });
       }
 
-      setupCodeBlocks();
       document.addEventListener('astro:page-load', setupCodeBlocks);
     </script>
   </body>

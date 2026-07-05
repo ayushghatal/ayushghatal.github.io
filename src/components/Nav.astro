@@ -32,6 +32,7 @@ const transitionName = postMode
       <a href={backHref} class="return">&larr; return</a>
       {toc.length > 0 && (
         <div class="toc">
+          <span class="toc-indicator" id="toc-indicator"></span>
           {toc.map(h => (
             <a href={`#${h.slug}`} data-slug={h.slug} class="toc-link">{h.text}</a>
           ))}
@@ -75,7 +76,6 @@ const transitionName = postMode
     });
   }
 
-  updateActiveNav();
   document.addEventListener('astro:page-load', updateActiveNav);
 </script>
 
@@ -90,10 +90,22 @@ const transitionName = postMode
       const links = document.querySelectorAll('.toc-link');
       if (links.length === 0) return;
 
+      const tocContainer = document.querySelector('.toc') as HTMLElement | null;
+      const indicator = document.getElementById('toc-indicator');
+
       const sections = [...links]
         .map(link => document.getElementById((link as HTMLElement).dataset.slug || ''))
         .filter((el): el is HTMLElement => !!el);
       if (sections.length === 0) return;
+
+      function moveIndicator(link: Element | null) {
+        if (!indicator || !tocContainer || !link) return;
+        const linkRect = link.getBoundingClientRect();
+        const containerRect = tocContainer.getBoundingClientRect();
+        indicator.style.transform = `translateY(${linkRect.top - containerRect.top}px)`;
+        indicator.style.height = `${linkRect.height}px`;
+        indicator.classList.add('visible');
+      }
 
       const observer = new IntersectionObserver(
         (entries) => {
@@ -102,6 +114,7 @@ const transitionName = postMode
             if (entry.isIntersecting) {
               links.forEach(l => l.classList.remove('active'));
               link?.classList.add('active');
+              moveIndicator(link);
             }
           });
         },
@@ -110,7 +123,6 @@ const transitionName = postMode
       sections.forEach(section => observer.observe(section));
     }
 
-    setupTOC();
     document.addEventListener('astro:page-load', setupTOC);
   </script>
 )}
@@ -166,13 +178,29 @@ const transitionName = postMode
   }
 
   .toc {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
     margin-top: 0.5rem;
     padding-top: 0.5rem;
+    padding-left: 0.75rem;
     border-top: 1px solid var(--color-border);
     max-width: 11rem;
+  }
+
+  .toc-indicator {
+    position: absolute;
+    left: 0;
+    top: 0.5rem;
+    width: 2px;
+    background: var(--color-text);
+    opacity: 0;
+    transition: transform 0.25s ease, height 0.25s ease, opacity 0.2s ease;
+  }
+
+  .toc-indicator.visible {
+    opacity: 1;
   }
 
   .social {

@@ -116,7 +116,6 @@ const categories = [...new Set(posts.map(p => p.category))];
     applyFilters();
   }
 
-  setupWritingControls();
   document.addEventListener('astro:page-load', setupWritingControls);
 </script>
 

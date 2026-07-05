@@ -1,0 +1,30 @@
+---
+layout: ../../layouts/ProjectLayout.astro
+title: "FPGA Digital Filter + STM32 SPI Interface"
+description: "An FPGA-based digital filter, simulated in Icarus Verilog and GTKWave, controlled over SPI by an STM32G0 running bare-metal firmware."
+tags: ["FPGA", "Verilog", "STM32", "SPI"]
+featured: true
+date: 2026-06-01
+repo: "#"
+---
+
+## What it does
+
+A digital filter implemented in Verilog, running on an FPGA, with its
+coefficients and mode set at runtime over SPI by an STM32G0 acting as the
+controller. The STM32 side is bare-metal — no HAL, registers configured
+directly — which is also what the ["Setting Up UART on STM32G0 Without
+HAL"](/writing/register-level-uart) post grew out of.
+
+## Why simulate first
+
+The filter design started entirely in simulation — Icarus Verilog for the
+testbench and design together, GTKWave for inspecting the resulting
+waveforms — before it touched a board at all. More on the reasoning for that
+in [this post](/writing/simulating-fpga-filter).
+
+## Current status
+
+The SPI link between the STM32 and the FPGA's control registers is working;
+the current focus is tightening up timing margins and cleaning up the
+control protocol before adding a second filter mode.

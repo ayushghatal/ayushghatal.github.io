@@ -1,93 +1,220 @@
 ---
-import BaseLayout from './BaseLayout.astro';
+import BaseLayout from "./BaseLayout.astro";
 
-const { frontmatter, headings } = Astro.props;
+const { frontmatter, headings, url } = Astro.props;
 const formatted = frontmatter.date
-  ? new Date(frontmatter.date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
-  : null;
-const metaParts = [formatted, frontmatter.category, ...(frontmatter.tags ?? [])].filter(Boolean);
----
-<BaseLayout
-  title={frontmatter.title}
-  description={frontmatter.description}
-  postMode={true}
-  headings={headings}
-  backHref="/writing"
->
-  <article>
-    <header>
-      <p class="meta">
-        {metaParts.map((part, i) => (
-          <>
-            {i > 0 && <span class="sep">&middot;</span>}
-            <span>{part}</span>
-          </>
-        ))}
-      </p>
-      <h1>{frontmatter.title}</h1>
-      {frontmatter.description && <p class="description">{frontmatter.description}</p>}
-    </header>
+    ? new Date(frontmatter.date).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+      })
+    : null;
 
-    <div class="prose">
-      <slot />
-    </div>
-  </article>
+// Pull every other post once, used for both series navigation and the
+// "related" block below. Reading straight from the source files means
+// neither of these need any manual upkeep as you add posts.
+const allPosts = Object.values(
+    import.meta.glob("../pages/writing/*.mdx", { eager: true }),
+)
+    .filter((p: any) => p.frontmatter?.title)
+    .map((p: any) => ({
+        ...p.frontmatter,
+        category: p.frontmatter.category || "General",
+        url: p.url,
+    }));
+const otherPosts = allPosts.filter((p) => p.url !== url);
+
+// Series: only shown when there's more than one part — a "series" of one
+// isn't meaningfully a series. Sorted by `part` so prev/next is sequential
+// regardless of publish date.
+const seriesPosts = frontmatter.series
+    ? allPosts
+          .filter((p) => p.series === frontmatter.series)
+          .sort((a, b) => (a.part ?? 0) - (b.part ?? 0))
+    : [];
+const seriesTotal = seriesPosts.length;
+const seriesIndex = seriesPosts.findIndex((p) => p.url === url);
+const prevInSeries =
+    seriesTotal > 1 && seriesIndex > 0 ? seriesPosts[seriesIndex - 1] : null;
+const nextInSeries =
+    seriesTotal > 1 && seriesIndex < seriesTotal - 1
+        ? seriesPosts[seriesIndex + 1]
+        : null;
+
+// Related: same category, most recent first, excluding this post.
+const related = otherPosts
+    .filter((p) => p.category === (frontmatter.category || "General"))
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 3);
+
+const metaParts = [
+    formatted,
+    seriesTotal > 1 ? `part ${frontmatter.part} of ${seriesTotal}` : null,
+    frontmatter.category,
+    ...(frontmatter.tags ?? []),
+].filter(Boolean);
+
+const slug = url.split("/").filter(Boolean).pop();
+---
+
+<BaseLayout
+    title={frontmatter.title}
+    description={frontmatter.description}
+    postMode={true}
+    headings={headings}
+    backHref="/writing"
+    ogType="article"
+    ogImage={`/og/${slug}.png`}
+>
+    <article>
+        <header>
+            <p class="meta">
+                {
+                    metaParts.map((part, i) => (
+                        <>
+                            {i > 0 && <span class="sep">&middot;</span>}
+                            <span>{part}</span>
+                        </>
+                    ))
+                }
+            </p>
+            <h1>{frontmatter.title}</h1>
+            {
+                frontmatter.description && (
+                    <p class="description">{frontmatter.description}</p>
+                )
+            }
+        </header>
+
+        <div class="prose">
+            <slot />
+        </div>
+
+        {
+            (prevInSeries || nextInSeries) && (
+                <nav class="series-nav">
+                    {prevInSeries ? (
+                        <a href={prevInSeries.url} class="series-link prev">
+                            <span class="series-nav-label">
+                                &larr; part {prevInSeries.part}
+                            </span>
+                            <span class="series-nav-title">
+                                {prevInSeries.title}
+                            </span>
+                        </a>
+                    ) : (
+                        <span />
+                    )}
+                    {nextInSeries && (
+                        <a href={nextInSeries.url} class="series-link next">
+                            <span class="series-nav-label">
+                                part {nextInSeries.part} &rarr;
+                            </span>
+                            <span class="series-nav-title">
+                                {nextInSeries.title}
+                            </span>
+                        </a>
+                    )}
+                </nav>
+            )
+        }
+
+        {
+            related.length > 0 && (
+                <div class="related">
+                    <span class="section-label">related</span>
+                    <div class="row-list">
+                        {related.map((post) => (
+                            <a class="row related-row" href={post.url}>
+                                <h3>{post.title}</h3>
+                                <p>{post.description}</p>
+                            </a>
+                        ))}
+                    </div>
+                </div>
+            )
+        }
+    </article>
 </BaseLayout>
 
 <style>
-  .meta {
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    color: var(--color-text-muted);
-    margin: 0 0 0.75rem;
-  }
+    .meta {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: var(--color-text-muted);
+        margin: 0 0 0.75rem;
+    }
 
-  .sep {
-    color: var(--color-border);
-    margin: 0 0.5em;
-  }
+    .sep {
+        color: var(--color-border);
+        margin: 0 0.5em;
+    }
 
-  h1 {
-    margin: 0 0 0.5rem;
-  }
+    h1 {
+        margin: 0 0 0.5rem;
+    }
 
-  .description {
-    color: var(--color-text-muted);
-    font-size: 1.05rem;
-    margin-top: 0;
-  }
+    .description {
+        color: var(--color-text-muted);
+        font-size: 1.05rem;
+        margin-top: 0;
+    }
 
-  .prose {
-    margin-top: 3rem;
-    font-size: 1.05rem;
-    line-height: 1.75;
-  }
+    .series-nav {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-top: 3.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--color-border);
+    }
 
-  .prose :global(img) {
-    max-width: 100%;
-    border-radius: var(--radius);
-  }
+    .series-link {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        color: var(--color-text);
+    }
 
-  .prose :global(h2) {
-    font-size: 1.6rem;
-    font-weight: 700;
-    margin-top: 3.25rem;
-    margin-bottom: 1rem;
-  }
+    .series-link.next {
+        text-align: right;
+        grid-column: 2;
+    }
 
-  .prose :global(h2:first-child) {
-    margin-top: 0;
-  }
+    .series-nav-label {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--color-text-muted);
+    }
 
-  .prose :global(h3) {
-    font-size: 1.15rem;
-    font-weight: 600;
-    margin-top: 2.25rem;
-    margin-bottom: 0.75rem;
-  }
+    .series-nav-title {
+        font-size: 0.92rem;
+        color: var(--color-text-secondary);
+        transition: color 0.15s ease;
+    }
 
-  .prose :global(p) {
-    margin: 1.1em 0;
-    color: var(--color-text-secondary);
-  }
+    .series-link:hover .series-nav-title {
+        color: var(--color-text);
+    }
+
+    .related {
+        margin-top: 3.5rem;
+    }
+
+    .related-row h3 {
+        margin: 0;
+        font-size: 1rem;
+        color: var(--color-text-secondary);
+        transition: color 0.15s ease;
+    }
+
+    .related-row:hover h3 {
+        color: var(--color-text);
+    }
+
+    .related-row p {
+        margin: 0.35rem 0 0;
+        color: var(--color-text-muted);
+        font-size: 0.9rem;
+    }
 </style>
