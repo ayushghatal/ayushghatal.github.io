@@ -1,5 +1,5 @@
 ---
-import { ViewTransitions } from "astro:transitions";
+import { ClientRouter } from "astro:transitions";
 import Nav from "../components/Nav.astro";
 import CommandPalette from "../components/CommandPalette.astro";
 import "../styles/global.css";
@@ -41,7 +41,7 @@ const ogImageURL = new URL(ogImage, Astro.site);
         <meta name="twitter:description" content={description} />
         <meta name="twitter:image" content={ogImageURL} />
 
-        <ViewTransitions />
+        <ClientRouter />
     </head>
     <body>
         <Nav postMode={postMode} headings={headings} backHref={backHref} />
