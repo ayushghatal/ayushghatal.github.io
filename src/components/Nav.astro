@@ -53,7 +53,7 @@ const transitionName = postMode
         </a>
       ))}
       <button type="button" id="palette-trigger" class="nav-link palette-btn">
-        search <span class="kbd">&#8984;K</span>
+        search <span class="shortcut"><kbd>&#8984;K</kbd></span>
       </button>
       <div class="social">
         <a href={site.social.github} class="nav-link" target="_blank" rel="noopener">github</a>
@@ -178,11 +178,6 @@ const transitionName = postMode
     gap: 0.4rem;
   }
 
-  .kbd {
-    font-size: 0.68rem;
-    color: var(--color-text-muted);
-  }
-
   .shortcut {
     font-size: 0.65rem;
     color: var(--color-text-muted);
@@ -299,7 +294,7 @@ const transitionName = postMode
       padding-left: 0.8rem;
     }
 
-    .palette-btn .kbd {
+    .palette-btn .shortcut {
       display: none;
     }
   }

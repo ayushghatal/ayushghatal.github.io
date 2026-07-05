@@ -4,11 +4,17 @@ import TimelineEntry from '../../components/TimelineEntry.astro';
 
 const posts = Object.values(import.meta.glob('./*.mdx', { eager: true }))
   .filter(post => post.frontmatter?.title)
-  .map(post => ({ ...post.frontmatter, category: post.frontmatter.category || "General", url: post.url }))
+  .map(post => ({ ...post.frontmatter, category: post.frontmatter.category || "General", series: post.frontmatter.series || null, url: post.url }))
   .sort((a, b) => new Date(b.date) - new Date(a.date)); // newest first by default
 
 const latestDate = Math.max(...posts.map(p => new Date(p.date).getTime()));
 const categories = [...new Set(posts.map(p => p.category))];
+const allSeries = [...new Set(posts.map(p => p.series).filter(Boolean))];
+const seriesData = allSeries.map(name => ({
+  name,
+  count: posts.filter(p => p.series === name).length,
+  posts: posts.filter(p => p.series === name),
+}));
 ---
 <BaseLayout title="writing">
   <h1 fetchpriority="high">writing</h1>
@@ -20,19 +26,23 @@ const categories = [...new Set(posts.map(p => p.category))];
       {categories.map(category => (
         <button class="tab" data-category={category} type="button">{category.toLowerCase()}</button>
       ))}
+      {seriesData.length > 0 && (
+        <button class="tab" data-category="__series__" type="button">series</button>
+      )}
     </div>
     <button class="sort-toggle" id="sort-toggle" type="button" data-order="desc">
       newest first
     </button>
   </div>
 
-  <input
-    type="search"
-    id="search-input"
-    class="search-input"
-    placeholder="search writing..."
-    aria-label="Search writing"
-  />
+  <div class="series-overview hidden" id="series-overview">
+    {seriesData.map(s => (
+      <button class="series-card" data-series={s.name} type="button">
+        <span class="series-card-title">{s.name}</span>
+        <span class="series-card-count">{s.count} post{s.count !== 1 ? 's' : ''}</span>
+      </button>
+    ))}
+  </div>
 
   <div class="timeline" id="timeline">
     {posts.map(post => (
@@ -41,6 +51,7 @@ const categories = [...new Set(posts.map(p => p.category))];
         description={post.description}
         date={post.date}
         category={post.category}
+        series={post.series}
         tags={post.tags}
         url={post.url}
         featured={new Date(post.date).getTime() === latestDate}
@@ -48,52 +59,81 @@ const categories = [...new Set(posts.map(p => p.category))];
     ))}
   </div>
 
-  <p class="no-results hidden" id="no-results">nothing matches that search.</p>
+  <p class="no-results hidden" id="no-results">nothing matches.</p>
 </BaseLayout>
 
 <script>
-  // Re-runs on first load AND after every client-side view-transition
-  // navigation (astro:page-load). Without the second listener, this
-  // would only ever work the first time /writing is visited in a
-  // session — the elements it binds to get replaced by new ones on
-  // each subsequent navigation, and stale references stop responding.
   function setupWritingControls() {
     const tabsContainer = document.getElementById('category-tabs');
     const timeline = document.getElementById('timeline');
     const sortToggle = document.getElementById('sort-toggle');
-    const searchInput = document.getElementById('search-input') as HTMLInputElement | null;
     const noResults = document.getElementById('no-results');
-    if (!timeline || !tabsContainer || !sortToggle || !searchInput || !noResults) return;
+    const overview = document.getElementById('series-overview');
+    if (!timeline || !tabsContainer || !sortToggle || !noResults) return;
 
     let activeCategory = 'all';
+    let view = 'posts'; // 'posts' | 'series' | 'series-posts'
 
-    function applyFilters() {
-      const query = (searchInput!.value || '').trim().toLowerCase();
+    function render() {
+      const entries = [...timeline.querySelectorAll('.entry')] as HTMLElement[];
+
+      if (view === 'series') {
+        entries.forEach(e => e.classList.add('hidden'));
+        overview?.classList.remove('hidden');
+        noResults.classList.add('hidden');
+        return;
+      }
+
+      overview?.classList.add('hidden');
+      const cat = (view === 'series-posts' || activeCategory === '__series__') ? 'all' : activeCategory;
+      const seriesFilter = view === 'series-posts' ? activeCategory : null;
       let visibleCount = 0;
 
-      timeline!.querySelectorAll('.entry').forEach(entry => {
+      entries.forEach(entry => {
         const el = entry as HTMLElement;
-        const matchesCategory = activeCategory === 'all' || el.dataset.category === activeCategory;
-        const matchesSearch = !query || (el.dataset.search || '').includes(query);
-        const visible = matchesCategory && matchesSearch;
+        const matchesCategory = cat === 'all' || el.dataset.category === cat;
+        const matchesSeries = !seriesFilter || el.dataset.series === seriesFilter;
+        const visible = matchesCategory && matchesSeries;
         el.classList.toggle('hidden', !visible);
         if (visible) visibleCount++;
       });
 
-      noResults!.classList.toggle('hidden', visibleCount > 0);
+      noResults.classList.toggle('hidden', visibleCount > 0);
     }
 
     tabsContainer.addEventListener('click', (e) => {
       const btn = (e.target as HTMLElement).closest('.tab') as HTMLElement | null;
       if (!btn) return;
 
+      const cat = btn.dataset.category || 'all';
       tabsContainer.querySelectorAll('.tab').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
-      activeCategory = btn.dataset.category || 'all';
-      applyFilters();
+
+      if (cat === '__series__') {
+        view = 'series';
+        activeCategory = '__series__';
+      } else {
+        view = 'posts';
+        activeCategory = cat;
+      }
+      render();
     });
 
-    searchInput.addEventListener('input', applyFilters);
+    overview?.addEventListener('click', (e) => {
+      const card = (e.target as HTMLElement).closest('.series-card') as HTMLElement | null;
+      if (!card) return;
+
+      const series = card.dataset.series;
+      if (!series) return;
+
+      view = 'series-posts';
+      activeCategory = series;
+
+      tabsContainer.querySelectorAll('.tab').forEach(p => {
+        p.classList.toggle('active', p.dataset.category === '__series__');
+      });
+      render();
+    });
 
     sortToggle.addEventListener('click', () => {
       const wasAscending = sortToggle.dataset.order === 'asc';
@@ -101,19 +141,19 @@ const categories = [...new Set(posts.map(p => p.category))];
       sortToggle.dataset.order = nowAscending ? 'asc' : 'desc';
       sortToggle.textContent = nowAscending ? 'oldest first' : 'newest first';
 
-      const entries = [...timeline!.querySelectorAll('.entry')] as HTMLElement[];
+      const entries = [...timeline.querySelectorAll('.entry')] as HTMLElement[];
       entries.sort((a, b) => {
         const diff = new Date(a.dataset.date!).getTime() - new Date(b.dataset.date!).getTime();
         return nowAscending ? diff : -diff;
       });
-      entries.forEach(entry => timeline!.appendChild(entry));
+      entries.forEach(entry => timeline.appendChild(entry));
     });
 
-    // Reset to a clean state each time this page loads (matters when
-    // navigating back to /writing after having filtered it earlier).
+    // Reset on page load
+    view = 'posts';
     activeCategory = 'all';
-    searchInput.value = '';
-    applyFilters();
+    tabsContainer.querySelectorAll('.tab').forEach(p => p.classList.toggle('active', p.dataset.category === 'all'));
+    render();
   }
 
   document.addEventListener('astro:page-load', setupWritingControls);
@@ -178,26 +218,49 @@ const categories = [...new Set(posts.map(p => p.category))];
     content: "↕ ";
   }
 
-  .search-input {
-    display: block;
+  .series-overview {
+    margin-top: 2rem;
+  }
+
+  .series-overview.hidden {
+    display: none;
+  }
+
+  .series-card {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
     width: 100%;
-    margin-top: 1.25rem;
-    padding: 0.6rem 0;
+    padding: 1rem 0;
     background: none;
     border: none;
     border-bottom: 1px solid var(--color-border);
     color: var(--color-text);
-    font-family: var(--font-body);
-    font-size: 0.95rem;
+    cursor: pointer;
+    text-align: left;
+    font: inherit;
   }
 
-  .search-input::placeholder {
+  .series-card:last-child {
+    border-bottom: none;
+  }
+
+  .series-card:hover .series-card-title {
+    color: var(--color-text);
+  }
+
+  .series-card-title {
+    font-size: 1.05rem;
+    color: var(--color-text-secondary);
+    transition: color 0.15s ease;
+  }
+
+  .series-card-count {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
     color: var(--color-text-muted);
-  }
-
-  .search-input:focus {
-    outline: none;
-    border-bottom-color: var(--color-text);
+    white-space: nowrap;
   }
 
   .no-results {
@@ -227,7 +290,6 @@ const categories = [...new Set(posts.map(p => p.category))];
 
   .timeline :global(.entry) {
     border-bottom: 1px solid var(--color-border);
-    /* Long archives: don't pay layout/paint cost for off-screen rows. */
     content-visibility: auto;
     contain-intrinsic-size: auto 140px;
   }

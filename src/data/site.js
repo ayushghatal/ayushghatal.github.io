@@ -5,7 +5,7 @@ export const site = {
   description: "Notes and projects on embedded systems, FPGA, and physics.",
   social: {
     github: "https://github.com/ayushghatal",
-    email: "mailto:you@example.com", // edit to your real address
-    linkedin: "https://linkedin.com/in/your-handle", // edit to your real profile
+    email: "mailto:ayushghatal8@gmail.com", // edit to your real address
+    linkedin: "https://linkedin.com/in/ayushsinghghatal", // edit to your real profile
   },
 };
