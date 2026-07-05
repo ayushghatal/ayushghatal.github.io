@@ -152,7 +152,15 @@ const items = [...pages, ...posts, ...projectPages, ...socials];
     let gPending = false;
     let gTimer: ReturnType<typeof setTimeout> | null = null;
 
+    function isEditable(el: EventTarget | null): boolean {
+      if (!el || !(el instanceof HTMLElement)) return false;
+      const tag = el.tagName.toLowerCase();
+      return tag === 'input' || tag === 'textarea' || el.isContentEditable;
+    }
+
     document.addEventListener('keydown', (e) => {
+      if (isEditable(e.target)) return;
+
       const isMac = navigator.platform.toUpperCase().includes('MAC');
       const cmdKey = isMac ? e.metaKey : e.ctrlKey;
 
@@ -187,7 +195,7 @@ const items = [...pages, ...posts, ...projectPages, ...socials];
       if (e.key.toLowerCase() === 'g' && !cmdKey && !e.altKey && !e.shiftKey) {
         gPending = true;
         if (gTimer) clearTimeout(gTimer);
-        gTimer = setTimeout(() => { gPending = false; }, 500);
+        gTimer = setTimeout(() => { gPending = false; }, 700);
         e.preventDefault();
         return;
       }
@@ -307,4 +315,5 @@ const items = [...pages, ...posts, ...projectPages, ...socials];
   .palette-empty.hidden {
     display: none;
   }
+
 </style>

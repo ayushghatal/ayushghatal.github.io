@@ -1,99 +1,112 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import ActivityGrid from '../components/ActivityGrid.astro';
-import ProjectCard from '../components/ProjectCard.astro';
-import PostCard from '../components/PostCard.astro';
-import ReadingRow from '../components/ReadingRow.astro';
-import { reading } from '../data/reading.js';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ActivityGrid from "../components/ActivityGrid.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import PostCard from "../components/PostCard.astro";
+import ReadingRow from "../components/ReadingRow.astro";
+import { reading } from "../data/reading.js";
 
 // Pulls every .mdx file out of /writing and /projects so the homepage can
 // show the latest posts and the featured projects. This is the only place
 // that needs to know how those are found — edit here if that ever changes.
-const allPosts = Object.values(import.meta.glob('./writing/*.mdx', { eager: true }));
+const allPosts = Object.values(
+    import.meta.glob("./writing/*.mdx", { eager: true }),
+);
 const posts = allPosts
-  .filter(post => post.frontmatter?.title)
-  .sort((a, b) => new Date(b.frontmatter.date) - new Date(a.frontmatter.date))
-  .slice(0, 3);
+    .filter((post) => post.frontmatter?.title)
+    .sort((a, b) => new Date(b.frontmatter.date) - new Date(a.frontmatter.date))
+    .slice(0, 3);
 
-const projects = Object.values(import.meta.glob('./projects/*.mdx', { eager: true }))
-  .filter((p: any) => p.frontmatter?.title)
-  .map((p: any) => ({ ...p.frontmatter, url: p.url }))
-  .filter(p => p.featured);
+const projects = Object.values(
+    import.meta.glob("./projects/*.mdx", { eager: true }),
+)
+    .filter((p: any) => p.frontmatter?.title)
+    .map((p: any) => ({ ...p.frontmatter, url: p.url }))
+    .filter((p) => p.featured);
 ---
+
 <BaseLayout>
-  <section class="intro">
-    <h1>Hey, I'm Ayush.</h1>
-    <p>
-      I'm a third-year ECE student in Bengaluru, currently knee-deep in FPGA
-      coursework and building an SPI bridge between an STM32 and a digital
-      filter I wrote in Verilog. When I'm not doing that, I'm slowly working
-      through a physics curriculum I built for myself — mostly out of
-      stubbornness. This site is where both of those live.
-    </p>
-    <p class="now">
-      <span class="now-label">now</span>
-      Debugging the SPI link between the STM32 and the Verilog filter, and
-      making my way through Griffiths' <em>Electrodynamics</em>.
-    </p>
-  </section>
+    <section class="intro">
+        <h1>Hey, I'm Ayush.</h1>
+        <p>
+            I'm a third-year ECE student in Bengaluru, currently knee-deep in
+            FPGA coursework and building an SPI bridge between an STM32 and a
+            digital filter I wrote in Verilog. When I'm not doing that, I'm
+            slowly working through a physics curriculum I built for myself —
+            mostly out of stubbornness. This site is where both of those live.
+        </p>
+        <p class="now">
+            <span class="now-label">currently</span>
+            Debugging the SPI link between the STM32 and the Verilog filter, and making
+            my way through Griffiths' <em>Electrodynamics</em>.
+        </p>
+    </section>
 
-  <span class="section-label">activity</span>
-  <ActivityGrid />
+    <span class="section-label">activity</span>
+    <ActivityGrid />
 
-  <span class="section-label">work</span>
-  <div class="row-list compact">
-    {projects.map(project => <ProjectCard {...project} />)}
-  </div>
-  <a class="see-all" href="/projects">view all projects &rarr;</a>
+    <span class="section-label">work</span>
+    <div class="row-list compact">
+        {projects.map((project) => <ProjectCard {...project} />)}
+    </div>
+    <a class="see-all" href="/projects">view all projects &rarr;</a>
 
-  <span class="section-label">writing</span>
-  <div class="row-list compact">
-    {posts.map(post => (
-      <PostCard
-        title={post.frontmatter.title}
-        description={post.frontmatter.description}
-        date={post.frontmatter.date}
-        url={post.url}
-      />
-    ))}
-  </div>
-  <a class="see-all" href="/writing">see all writing &rarr;</a>
+    <span class="section-label">writing</span>
+    <div class="row-list compact">
+        {
+            posts.map((post) => (
+                <PostCard
+                    title={post.frontmatter.title}
+                    description={post.frontmatter.description}
+                    date={post.frontmatter.date}
+                    url={post.url}
+                />
+            ))
+        }
+    </div>
+    <a class="see-all" href="/writing">see all writing &rarr;</a>
 
-  <span class="section-label">currently reading</span>
-  <div class="row-list compact">
-    {reading.map(item => <ReadingRow {...item} />)}
-  </div>
+    <span class="section-label">currently reading</span>
+    <div class="row-list compact">
+        {reading.map((item) => <ReadingRow {...item} />)}
+    </div>
 </BaseLayout>
 
 <style>
-  .intro p {
-    color: var(--color-text-muted);
-    font-size: 1.05rem;
-    line-height: 1.7;
-    max-width: 34rem;
-    margin-top: 1rem;
-  }
+    .intro p {
+        color: var(--color-text-muted);
+        font-size: 1.05rem;
+        line-height: 1.7;
+        max-width: 34rem;
+        margin-top: 1rem;
+    }
 
-  .now {
-    margin-top: 1.5rem !important;
-    padding-top: 1.25rem;
-    border-top: 1px solid var(--color-border);
-    font-size: 0.95rem !important;
-  }
+    .now {
+        margin-top: 1.2rem !important;
+        padding-top: 1.25rem;
+        font-size: 0.95rem !important;
+        color: var(--color-text-secondary);
+    }
 
-  .now-label {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    text-transform: lowercase;
-    letter-spacing: 0.05em;
-    color: var(--color-text-secondary);
-    margin-right: 0.6em;
-  }
+    .now-label {
+        display: block;
+        width: fit-content;
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        text-transform: lowercase;
+        letter-spacing: 0.05em;
+        color: var(--color-text);
+        border: 1px solid var(--color-border);
+        border-radius: 3px;
+        padding: 0.1rem 0.5rem;
+        margin-bottom: 0.5rem;
+        background: var(--color-bg-raised);
+    }
 
-  .see-all {
-    display: inline-block;
-    margin-top: 1rem;
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-  }
+    .see-all {
+        display: inline-block;
+        margin-top: 1rem;
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+    }
 </style>

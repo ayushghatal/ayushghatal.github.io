@@ -4,6 +4,7 @@ import { site } from '../data/site.js';
 const { postMode = false, headings = [], backHref = "/writing" } = Astro.props;
 
 // Edit this list to add/remove site-wide nav links.
+const shortcuts = { "/": "h", "/writing": "w", "/projects": "p" };
 const links = [
   { href: "/", label: "home" },
   { href: "/writing", label: "writing" },
@@ -48,6 +49,7 @@ const transitionName = postMode
           class:list={["nav-link", { active: current === link.href }]}
         >
           {link.label}
+          <span class="shortcut">g <kbd>{shortcuts[link.href]}</kbd></span>
         </a>
       ))}
       <button type="button" id="palette-trigger" class="nav-link palette-btn">
@@ -81,20 +83,19 @@ const transitionName = postMode
 
 {postMode && toc.length > 0 && (
   <script>
-    // Highlights the currently visible section in the floating TOC as the
-    // reader scrolls. Runs on load AND after each view-transition
-    // navigation (astro:page-load) — without that second listener, moving
-    // between posts via the soft-navigation router would leave the old
-    // observer pointed at a DOM that no longer exists.
+    // Tracks which section is in view and highlights the corresponding TOC
+    // link + moves the indicator. Uses scroll position instead of an
+    // IntersectionObserver so it reliably tracks the last section when
+    // scrolled to the bottom of the page.
     function setupTOC() {
-      const links = document.querySelectorAll('.toc-link');
+      const links = [...document.querySelectorAll('.toc-link')] as HTMLElement[];
       if (links.length === 0) return;
 
       const tocContainer = document.querySelector('.toc') as HTMLElement | null;
       const indicator = document.getElementById('toc-indicator');
 
-      const sections = [...links]
-        .map(link => document.getElementById((link as HTMLElement).dataset.slug || ''))
+      const sections = links
+        .map(link => document.getElementById(link.dataset.slug || ''))
         .filter((el): el is HTMLElement => !!el);
       if (sections.length === 0) return;
 
@@ -107,20 +108,25 @@ const transitionName = postMode
         indicator.classList.add('visible');
       }
 
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach(entry => {
-            const link = document.querySelector(`.toc-link[data-slug="${entry.target.id}"]`);
-            if (entry.isIntersecting) {
-              links.forEach(l => l.classList.remove('active'));
-              link?.classList.add('active');
-              moveIndicator(link);
-            }
-          });
-        },
-        { rootMargin: '-10% 0px -70% 0px' }
-      );
-      sections.forEach(section => observer.observe(section));
+      function updateActive() {
+        const scrollTop = window.scrollY + 100;
+        let active = sections[0];
+
+        for (const section of sections) {
+          if (section.offsetTop <= scrollTop) {
+            active = section;
+          }
+        }
+
+        const activeLink = links.find(l => l.dataset.slug === active.id);
+        links.forEach(l => l.classList.remove('active'));
+        activeLink?.classList.add('active');
+        moveIndicator(activeLink ?? null);
+      }
+
+      const onScroll = () => requestAnimationFrame(updateActive);
+      window.addEventListener('scroll', onScroll, { passive: true });
+      updateActive();
     }
 
     document.addEventListener('astro:page-load', setupTOC);
@@ -175,6 +181,26 @@ const transitionName = postMode
   .kbd {
     font-size: 0.68rem;
     color: var(--color-text-muted);
+  }
+
+  .shortcut {
+    font-size: 0.65rem;
+    color: var(--color-text-muted);
+    opacity: 0.5;
+    margin-left: 0.4rem;
+    transition: opacity 0.2s ease;
+  }
+
+  .nav-link:hover .shortcut {
+    opacity: 0.9;
+  }
+
+  .shortcut kbd {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    background: none;
+    padding: 0;
   }
 
   .toc {

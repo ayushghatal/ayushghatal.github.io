@@ -1,33 +1,57 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import BaseLayout from "../layouts/BaseLayout.astro";
 ---
+
 <BaseLayout title="not found">
-  <div class="not-found">
-    <h1>404</h1>
-    <p>There's nothing here.</p>
-    <a href="/">&larr; return home</a>
-  </div>
+    <div class="not-found">
+        <span class="err-code">404</span>
+        <p class="err-msg">this page doesn't exist.</p>
+        <p class="err-hint">
+            it may have moved, or the url might be wrong.
+        </p>
+        <a href="/" class="err-return">&larr; return home</a>
+    </div>
 </BaseLayout>
 
 <style>
-  .not-found {
-    min-height: 50vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
+    .not-found {
+        min-height: 55vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+    }
 
-  .not-found p {
-    color: var(--color-text-muted);
-  }
+    .err-code {
+        font-family: var(--font-mono);
+        font-size: 4.5rem;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: -0.04em;
+        color: var(--color-text);
+    }
 
-  .not-found a {
-    display: inline-block;
-    margin-top: 0.5rem;
-    color: var(--color-text-secondary);
-  }
+    .err-msg {
+        margin: 0.75rem 0 0;
+        font-size: 1.1rem;
+        color: var(--color-text-secondary);
+    }
 
-  .not-found a:hover {
-    color: var(--color-text);
-  }
+    .err-hint {
+        margin: 0.35rem 0 0;
+        font-size: 0.9rem;
+        color: var(--color-text-muted);
+    }
+
+    .err-return {
+        display: inline-block;
+        margin-top: 1.25rem;
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+        color: var(--color-text-secondary);
+    }
+
+    .err-return:hover {
+        color: var(--color-text);
+    }
 </style>

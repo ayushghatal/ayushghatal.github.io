@@ -1,42 +1,89 @@
 ---
 const { title, author, status } = Astro.props;
 ---
-<div class="row">
+
+<div class="row reading-row">
   <div class="row-top">
-    <h3>{title}</h3>
-    <span class="status">{status}</span>
+    <div class="title-col">
+      <h3>{title}</h3>
+      {author && <p class="author">{author}</p>}
+    </div>
+    <span class:list={["status", `status--${status}`]}>
+      <span class="status-dot" aria-hidden="true"></span>
+      {status}
+    </span>
   </div>
-  {author && <p>{author}</p>}
 </div>
 
 <style>
+  .reading-row {
+    padding: 0.85rem 0;
+  }
+
   .row-top {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
     gap: 1rem;
   }
 
+  .title-col {
+    min-width: 0;
+  }
+
   h3 {
     margin: 0;
+    font-size: 1rem;
     color: var(--color-text-secondary);
     transition: color 0.15s ease;
   }
 
-  .row:hover h3 {
+  .reading-row:hover h3 {
     color: var(--color-text);
   }
 
-  .status {
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
+  .author {
+    margin: 0.2rem 0 0;
     color: var(--color-text-muted);
-    white-space: nowrap;
+    font-size: 0.85rem;
+    font-style: italic;
   }
 
-  p {
-    margin: 0.3rem 0 0;
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: lowercase;
+    white-space: nowrap;
     color: var(--color-text-muted);
-    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .status-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+  }
+
+  .status--reading {
+    color: var(--color-text);
+  }
+
+  .status--reading .status-dot {
+    background: var(--color-text);
+  }
+
+  .status--queued .status-dot {
+    background: var(--color-text-muted);
+  }
+
+  .status--evaluating .status-dot {
+    background: var(--color-text-muted);
+  }
+
+  .status--done .status-dot {
+    background: var(--color-text-muted);
   }
 </style>

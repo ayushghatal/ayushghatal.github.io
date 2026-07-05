@@ -32,6 +32,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
 }
 
 body {
@@ -175,6 +176,50 @@ code {
   color: var(--color-text-secondary);
 }
 
+.prose ul,
+.prose ol {
+  padding-left: 1.5rem;
+  color: var(--color-text-secondary);
+  margin: 1.1em 0;
+}
+
+.prose li {
+  margin: 0.4em 0;
+}
+
+.prose li > ul,
+.prose li > ol {
+  margin: 0.2em 0;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.9rem;
+}
+
+.prose th,
+.prose td {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--color-border);
+  text-align: left;
+}
+
+.prose th {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-transform: lowercase;
+  letter-spacing: 0.03em;
+  font-weight: 400;
+  color: var(--color-text-muted);
+  background: var(--color-bg-raised);
+}
+
+.prose td {
+  color: var(--color-text-secondary);
+}
+
 /* Footnotes (standard Markdown [^1] syntax, rendered by remark-gfm). */
 .prose .footnotes {
   margin-top: 3.5rem;
@@ -252,6 +297,30 @@ blockquote {
 ::selection {
   background: var(--color-text);
   color: var(--color-bg);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+html {
+  scrollbar-color: var(--color-border) transparent;
+  scrollbar-width: thin;
 }
 
 /* ---- code block chrome, injected wrapper from BaseLayout script ---- */
