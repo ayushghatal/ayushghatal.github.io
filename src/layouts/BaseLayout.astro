@@ -27,6 +27,8 @@ const ogImageURL = new URL(ogImage, Astro.site);
         <meta name="description" content={description} />
         <title>{pageTitle}</title>
         <meta name="color-scheme" content="dark" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon.ico" sizes="48x48" />
         <link rel="canonical" href={canonicalURL} />
 
         <meta property="og:title" content={pageTitle} />
@@ -52,8 +54,8 @@ const ogImageURL = new URL(ogImage, Astro.site);
             </main>
             <footer>
                 <p>
-                    &copy; {new Date().getFullYear()}
-                    {site.name}. Built with Astro.
+                    &copy; {new Date().getFullYear()} {site.name}.
+                    <a href="https://github.com/ayushghatal/portfolio" target="_blank" rel="noopener">built with astro</a>
                 </p>
             </footer>
         </div>
@@ -129,6 +131,17 @@ const ogImageURL = new URL(ogImage, Astro.site);
         border-top: 1px solid var(--color-border);
         color: var(--color-text-muted);
         font-size: 0.8rem;
+    }
+
+    footer a {
+        color: var(--color-text-muted);
+        border-bottom: 1px solid var(--color-border);
+        transition: color 0.2s ease, border-color 0.2s ease;
+    }
+
+    footer a:hover {
+        color: var(--color-text);
+        border-color: var(--color-text);
     }
 
     @media (max-width: 900px) {
