@@ -3,10 +3,10 @@
 // frontmatter is just YAML, so it can't hold an imported/optimized image object.
 // For real optimized images (diagrams, screenshots), put them directly in the
 // project's .mdx body with standard Markdown syntax instead — see README.
-const { title, description, tags = [], link, image } = Astro.props;
+const { title, description, tags = [], url, image } = Astro.props;
 ---
 
-<a class="row" href={link}>
+<a class="row" href={url}>
     {
         image && (
             <img

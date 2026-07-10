@@ -2,18 +2,13 @@
 // status: "reading" | "queued" | "evaluating" | "done"
 export const reading = [
   {
-    title: "Theoretical Astrophysics",
-    author: "T. Padmanabhan",
-    status: "evaluating",
-  },
-  {
-    title: "The Feynman Lectures on Physics, Vol. I",
-    author: "Richard Feynman",
+    title: "Classical Mechanics",
+    author: "John R.Taylor",
     status: "reading",
   },
   {
-    title: "Introduction to Electrodynamics",
-    author: "David Griffiths",
-    status: "queued",
+    title: "Design Recipes for FPGA",
+    author: "Peter Wilson",
+    status: "reading",
   },
 ];

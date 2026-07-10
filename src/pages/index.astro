@@ -29,7 +29,7 @@ const projects = Object.values(
     <section class="intro">
         <h1 fetchpriority="high">Hey, I'm Ayush.</h1>
         <p>
-            I'm a third-year ECE student in Bengaluru, currently knee-deep in
+            I'm a third-year ECE student at GBPIET Pauri, currently knee-deep in
             FPGA coursework and building an SPI bridge between an STM32 and a
             digital filter I wrote in Verilog. When I'm not doing that, I'm
             slowly working through a physics curriculum I built for myself —
@@ -37,15 +37,18 @@ const projects = Object.values(
         </p>
         <p class="now">
             <span class="now-label">currently</span>
-            Debugging the SPI link between the STM32 and the Verilog filter, and making
-            my way through Griffiths' <em>Electrodynamics</em>.
+            Knee-deep into <em>FPGA Coursework</em> and building a <em
+                >8-bit CPU</em
+            > in Verilog. And making wayh througn Taylor's <em
+                >Classical Mechanics</em
+            >.
         </p>
     </section>
 
     <span class="section-label">activity</span>
     <ActivityGrid />
 
-    <span class="section-label">work</span>
+    <span class="section-label">projects</span>
     <div class="row-list compact">
         {projects.map((project) => <ProjectCard {...project} />)}
     </div>
