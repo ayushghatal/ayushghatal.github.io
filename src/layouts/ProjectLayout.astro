@@ -35,6 +35,12 @@ const slug = url.split("/").filter(Boolean).pop();
                         </>
                     ))
                 }
+                {frontmatter.status === "in-progress" && (
+                    <>
+                        <span class="sep">&middot;</span>
+                        <span class="status-badge">in-progress</span>
+                    </>
+                )}
             </p>
             <h1>{frontmatter.title}</h1>
             {
@@ -95,5 +101,14 @@ const slug = url.split("/").filter(Boolean).pop();
 
     .repo-link:hover {
         color: var(--color-text);
+    }
+
+    .status-badge {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--color-text-secondary);
+        border: 1px solid var(--color-border);
+        border-radius: 3px;
+        padding: 0.1rem 0.4rem;
     }
 </style>

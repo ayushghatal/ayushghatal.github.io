@@ -62,7 +62,8 @@ import '../../styles/admin.css';
           <div class="ed-section" id="section-projects" style="display:none">
             <div class="ed-section-title">Project</div>
             <div class="ed-grid">
-              <div class="ed-field span"><label>Repo URL</label><input type="text" id="ed-repo" placeholder="https://github.com/..." /></div>
+              <div class="ed-field"><label>Repo URL</label><input type="text" id="ed-repo" placeholder="https://github.com/..." /></div>
+              <div class="ed-field"><label>Status</label><select id="ed-status-select"><option value="">None</option><option value="in-progress">In Progress</option><option value="completed">Completed</option></select></div>
             </div>
             <div class="ed-toggles" style="margin-top:0.65rem">
               <label class="ed-toggle"><input type="checkbox" id="ed-featured" /> Featured on homepage</label>
@@ -129,6 +130,7 @@ import '../../styles/admin.css';
           if (d.collection === 'projects') {
             $('#ed-featured').checked = fm.featured === true;
             $('#ed-repo').value = fm.repo || '';
+            $('#ed-status-select').value = fm.status || '';
           } else {
             $('#ed-series').value = fm.series || '';
             $('#ed-part').value = fm.part || '';
@@ -156,7 +158,7 @@ import '../../styles/admin.css';
       $('#ed-category').value = ''; $('#ed-tags').value = '';
       $('#ed-draft').checked = true;
       showCollectionFields(currentView);
-      if (currentView === 'projects') { $('#ed-featured').checked = false; $('#ed-repo').value = ''; }
+      if (currentView === 'projects') { $('#ed-featured').checked = false; $('#ed-repo').value = ''; $('#ed-status-select').value = ''; }
       else { $('#ed-series').value = ''; $('#ed-part').value = ''; }
       setEditorContent('');
     }

@@ -157,8 +157,10 @@ export function gatherFm(): Record<string, any> {
   if (collection === 'projects') {
     const f = $('#ed-featured').checked;
     const r = $('#ed-repo').value.trim();
+    const s = $('#ed-status-select').value.trim();
     if (f) fm.featured = f;
     if (r) fm.repo = r;
+    if (s) fm.status = s;
   } else {
     const s = $('#ed-series').value.trim();
     const p = $('#ed-part').value;

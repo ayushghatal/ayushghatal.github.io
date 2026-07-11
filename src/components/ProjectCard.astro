@@ -3,7 +3,7 @@
 // frontmatter is just YAML, so it can't hold an imported/optimized image object.
 // For real optimized images (diagrams, screenshots), put them directly in the
 // project's .mdx body with standard Markdown syntax instead — see README.
-const { title, description, tags = [], url, image } = Astro.props;
+const { title, description, tags = [], url, image, status } = Astro.props;
 ---
 
 <a class="row" href={url}>
@@ -19,6 +19,7 @@ const { title, description, tags = [], url, image } = Astro.props;
     }
     <div class="row-top">
         <h3>{title}</h3>
+        {status === "in-progress" && <span class="status-badge">in-progress</span>}
         <span class="arrow">&rarr;</span>
     </div>
     <p>{description}</p>
@@ -91,5 +92,15 @@ const { title, description, tags = [], url, image } = Astro.props;
     .sep {
         color: var(--color-border);
         margin: 0 0.45em;
+    }
+
+    .status-badge {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--color-text-secondary);
+        border: 1px solid var(--color-border);
+        border-radius: 3px;
+        padding: 0.1rem 0.4rem;
+        white-space: nowrap;
     }
 </style>
