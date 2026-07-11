@@ -2,8 +2,8 @@
 // status: "reading" | "queued" | "evaluating" | "done"
 export const reading = [
   {
-    title: "Classical Mechanics",
-    author: "John R.Taylor",
+    title: "The Rust Programming Language",
+    author: "Steve Klabnik and Carol Nichols",
     status: "reading",
   },
   {
